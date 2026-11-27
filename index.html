@@ -4,15 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nearbuy — Find everything, nearby.</title>
-  <link rel="icon" type="image/png" href="./favicon.png">
+  <link rel="icon" type="image/png" href="./favicon.png" />
   <meta name="description" content="Nearbuy (N-commerce) connects Madrid shoppers in Argüelles, Salamanca & Tetuán with real-time stock at independent local stores using AI." />
 
-  <!-- Google Fonts: Bricolage Grotesque & DM Sans -->
+  <!-- Google Fonts: Bricolage Grotesque (Headings) & DM Sans (Body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -20,19 +20,19 @@
         extend: {
           colors: {
             nearbuy: {
-              cobalt: '#304EB0',
-              cobaltDark: '#243C8E',
-              mint: '#DAF8FA',
-              charcoal: '#1E1E1E',
+              cobalt: "#304EB0",
+              cobaltDark: "#243D8F",
+              blue: "#487FC0",
+              mint: "#DAF8FA",
+              charcoal: "#1E1E1E"
             }
           },
           fontFamily: {
-            display: ['"Bricolage Grotesque"', 'sans-serif'],
-            sans: ['"DM Sans"', 'sans-serif'],
+            display: ['"Bricolage Grotesque"', "sans-serif"],
+            sans: ['"DM Sans"', "sans-serif"]
           },
           boxShadow: {
-            card: '0 4px 20px -2px rgba(30, 30, 30, 0.06)',
-            phone: '0 25px 60px -15px rgba(15, 23, 42, 0.45)',
+            phone: "0 24px 54px -14px rgba(12, 24, 68, 0.42)"
           }
         }
       }
@@ -40,14 +40,19 @@
   </script>
 
   <style>
-    body {
-      font-family: 'DM Sans', sans-serif;
+    /* Base Typography & Overflow Safety (using clip to preserve sticky header) */
+    html, body {
+      font-family: "DM Sans", sans-serif;
       color: #1E1E1E;
       background-color: #FFFFFF;
-      overflow-x: hidden;
+      overflow-x: clip;
     }
 
-    /* Hide scrollbar for quick chips while preserving horizontal scroll */
+    h1, h2, h3, h4, .font-display {
+      font-family: "Bricolage Grotesque", sans-serif;
+    }
+
+    /* Hide horizontal scrollbar on chip strips */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -56,9 +61,9 @@
       scrollbar-width: none;
     }
 
-    /* Subtle chat scrollbar */
+    /* Subtle custom scrollbar for chat areas */
     .chat-scroll::-webkit-scrollbar {
-      width: 4px;
+      width: 5px;
     }
     .chat-scroll::-webkit-scrollbar-track {
       background: transparent;
@@ -68,295 +73,359 @@
       border-radius: 9999px;
     }
 
-    /* Smartphone expanded modal state */
-    .phone-backdrop {
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-    }
-    .phone-backdrop.is-open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .phone-shell {
-      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
-    }
-    .phone-shell.is-expanded {
-      position: fixed !important;
-      top: 50% !important;
-      left: 50% !important;
-      transform: translate(-50%, -50%) scale(1.04) !important;
-      z-index: 60 !important;
-      margin: 0 !important;
-    }
-
-    @media (max-height: 680px) {
-      .phone-shell.is-expanded {
-        transform: translate(-50%, -50%) scale(0.92) !important;
-      }
-    }
-
-    /* Legal & Merchant modal transitions */
-    .legal-backdrop {
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.22s ease;
-    }
-    .legal-backdrop.is-open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .legal-dialog {
-      transform: translateY(12px) scale(0.98);
-      transition: transform 0.22s ease;
-    }
-    .legal-backdrop.is-open .legal-dialog {
-      transform: translateY(0) scale(1);
-    }
-
-    /* Typing indicator animation */
-    @keyframes typingDot {
-      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-      40% { transform: scale(1); opacity: 1; }
+    /* Typing indicator dots */
+    @keyframes nbBounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+      40% { transform: translateY(-4px); opacity: 1; }
     }
     .typing-dot {
-      animation: typingDot 1.2s infinite ease-in-out;
+      animation: nbBounce 1.2s infinite ease-in-out both;
     }
-    .typing-dot:nth-child(2) { animation-delay: 0.15s; }
-    .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    /* macOS-Style Seamless Window Morph Overlay */
+    #fullscreen-chat {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: #F8FAFC;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      will-change: clip-path, transform, opacity;
+      box-shadow: 0 36px 90px -16px rgba(12, 24, 68, 0.55);
+    }
+
+    #fs-chat-inner {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transform: translateY(12px);
+      will-change: transform, opacity;
+      transition: opacity 380ms cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    #fs-chat-inner.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Legal Modal */
+    #legal-modal {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 220ms ease;
+    }
+    #legal-modal.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #legal-modal-card {
+      transform: translateY(10px) scale(0.98);
+      transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #legal-modal.is-open #legal-modal-card {
+      transform: translateY(0) scale(1);
+    }
   </style>
 </head>
 <body class="antialiased selection:bg-nearbuy-mint selection:text-nearbuy-cobalt">
 
-  <!-- Backdrop used only when the user clicks Expand (⤢) on the smartphone -->
-  <div
-    id="phone-backdrop"
-    onclick="togglePhoneExpand(false)"
-    class="phone-backdrop fixed inset-0 z-50 bg-nearbuy-charcoal/70 backdrop-blur-sm"
-    aria-hidden="true"
-  ></div>
-
-  <!-- =========================================================
-       1. HEADER (PURE WHITE #FFFFFF, STICKY, SUBTLE BORDER)
-       ========================================================= -->
-  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between gap-4">
-      <!-- Left: Official Mascot + Wordmark -->
-      <a href="#" class="flex items-center gap-2.5 group shrink-0">
-        <img
-          id="header-logo-img"
-          alt="Nearbuy Mascot"
-          class="w-9 h-9 object-contain transition-transform duration-200 group-hover:scale-105"
-        />
-        <span class="font-display font-extrabold text-2xl tracking-tight text-nearbuy-cobalt">Nearbuy</span>
-      </a>
-
-      <!-- Center Navigation -->
-      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-nearbuy-charcoal/80">
-        <a href="#n-commerce" class="hover:text-nearbuy-cobalt transition-colors" data-i18n="nav_ncommerce">N-commerce</a>
-        <a href="#how-it-works" class="hover:text-nearbuy-cobalt transition-colors" data-i18n="nav_how">How it works</a>
-        <a href="#merchants" class="hover:text-nearbuy-cobalt transition-colors" data-i18n="nav_merchants">For Merchants</a>
-      </nav>
-
-      <!-- Right Controls: EN | ES Switcher (EN active by default) + Cobalt CTA -->
-      <div class="flex items-center gap-3">
-        <div class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 p-0.5 text-xs font-bold" role="group" aria-label="Language switcher">
+  <!-- =========================================================================
+       CINEMATIC MACOS-STYLE FULLSCREEN CHAT WINDOW (#fullscreen-chat)
+       ========================================================================= -->
+  <section id="fullscreen-chat" aria-hidden="true" aria-label="Nearbuy AI Fullscreen Chat">
+    <div id="fs-chat-inner">
+      <!-- Top App Bar -->
+      <header class="bg-white border-b border-slate-200 shrink-0">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+          <!-- Back to Homepage -->
           <button
             type="button"
-            id="lang-en"
-            onclick="setLanguage('en')"
-            class="px-2.5 py-1.5 rounded-full bg-nearbuy-cobalt text-white transition-colors cursor-pointer"
+            onclick="closeFullscreenChat()"
+            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-slate-100 hover:bg-nearbuy-mint text-nearbuy-charcoal hover:text-nearbuy-cobalt text-xs sm:text-sm font-bold transition-colors cursor-pointer shrink-0"
+            data-i18n="back_to_nearbuy"
           >
-            EN
+            ← Back to Nearbuy
           </button>
-          <button
-            type="button"
-            id="lang-es"
-            onclick="setLanguage('es')"
-            class="px-2.5 py-1.5 rounded-full text-nearbuy-charcoal/70 hover:text-nearbuy-charcoal transition-colors cursor-pointer"
-          >
-            ES
-          </button>
-        </div>
 
-        <a
-          id="header-merchant-cta"
-          href="#merchants"
-          onclick="handleMerchantLink(event)"
-          class="hidden sm:inline-flex items-center px-5 py-2.5 rounded-full bg-nearbuy-cobalt hover:bg-nearbuy-cobaltDark text-white text-sm font-semibold transition-colors"
-          data-i18n="nav_cta"
-        >
-          Merchant Portal
-        </a>
-
-        <!-- Mobile Menu Toggle -->
-        <button
-          type="button"
-          onclick="toggleMobileMenu()"
-          class="md:hidden p-2 rounded-full border border-slate-200 text-nearbuy-charcoal hover:bg-slate-50 cursor-pointer"
-          aria-label="Toggle Menu"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Mobile Dropdown Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-200 px-4 py-4 space-y-2">
-      <a href="#n-commerce" onclick="toggleMobileMenu()" class="block px-3 py-2.5 rounded-xl text-sm font-medium text-nearbuy-charcoal hover:bg-slate-50" data-i18n="nav_ncommerce">N-commerce</a>
-      <a href="#how-it-works" onclick="toggleMobileMenu()" class="block px-3 py-2.5 rounded-xl text-sm font-medium text-nearbuy-charcoal hover:bg-slate-50" data-i18n="nav_how">How it works</a>
-      <a href="#merchants" onclick="toggleMobileMenu()" class="block px-3 py-2.5 rounded-xl text-sm font-medium text-nearbuy-charcoal hover:bg-slate-50" data-i18n="nav_merchants">For Merchants</a>
-      <a
-        href="#merchants"
-        onclick="toggleMobileMenu(); handleMerchantLink(event);"
-        class="block text-center mt-2 px-5 py-3 rounded-full bg-nearbuy-cobalt hover:bg-nearbuy-cobaltDark text-white text-sm font-semibold"
-        data-i18n="nav_cta"
-      >
-        Merchant Portal
-      </a>
-    </div>
-  </header>
-
-  <main>
-    <!-- =========================================================
-         2. BLOCK 1 — HERO (SOLID COBALT BLUE #304EB0)
-         ========================================================= -->
-    <section class="bg-nearbuy-cobalt text-white py-14 sm:py-20 lg:py-24">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-
-          <!-- Left Column: Crisp Editorial Copy (7 columns for generous full-screen breathing room) -->
-          <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
-            <!-- Small Mint Location Pill -->
-            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-nearbuy-mint text-nearbuy-cobalt text-xs sm:text-sm font-bold tracking-tight">
-              <span class="w-2 h-2 rounded-full bg-nearbuy-cobalt"></span>
-              <span data-i18n="hero_badge">Madrid: Argüelles, Salamanca &amp; Tetuán</span>
+          <!-- Brand & Status -->
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-9 h-9 rounded-full bg-nearbuy-mint border border-nearbuy-cobalt/15 p-1 flex items-center justify-center shrink-0">
+              <img id="fs-header-logo" alt="Nearbuy AI" class="w-full h-full object-contain" />
             </div>
-
-            <div class="space-y-3.5">
-              <h1 class="font-display font-extrabold text-3xl sm:text-4xl lg:text-[2.75rem] xl:text-[3.15rem] leading-[1.12] tracking-tight text-balance">
-                <span class="block text-white xl:whitespace-nowrap" data-i18n="hero_title_1">The speed of e-commerce.</span>
-                <span class="block text-nearbuy-mint mt-2 xl:whitespace-nowrap" data-i18n="hero_title_2">The soul of your neighborhood.</span>
-              </h1>
-              <p class="font-display font-bold text-lg sm:text-xl text-white/90 leading-snug">
-                Find everything, nearby.
+            <div class="min-w-0 leading-tight">
+              <p class="font-display font-bold text-sm sm:text-base text-nearbuy-charcoal truncate" data-i18n="phone_title">Nearbuy AI</p>
+              <p class="text-[11px] sm:text-xs text-slate-500 flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                <span class="truncate" data-i18n="hero_badge">Madrid: Argüelles, Salamanca &amp; Tetuán</span>
               </p>
-            </div>
-
-            <p class="text-base sm:text-lg text-white/85 max-w-xl mx-auto lg:mx-0 leading-relaxed" data-i18n="hero_subtitle">
-              Nearbuy's AI locates real in-stock products at independent Madrid shops just minutes away on foot, with live opening hours.
-            </p>
-
-            <!-- Primary & Secondary CTAs -->
-            <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-1">
-              <button
-                type="button"
-                onclick="focusPhoneChat()"
-                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-white hover:bg-nearbuy-mint text-nearbuy-cobalt font-bold text-base transition-colors cursor-pointer"
-                data-i18n="hero_cta_primary"
-              >
-                Try the AI Assistant
-              </button>
-
-              <a
-                href="#merchants"
-                class="w-full sm:w-auto inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-transparent hover:bg-white/10 text-white font-semibold text-base border border-white/45 transition-colors"
-                data-i18n="hero_cta_secondary"
-              >
-                Register your store
-              </a>
-            </div>
-
-            <!-- Subtle Trust Stats -->
-            <div class="pt-4 border-t border-white/15 grid grid-cols-3 gap-4 max-w-md mx-auto lg:mx-0 text-left">
-              <div>
-                <p class="font-display font-extrabold text-xl sm:text-2xl text-nearbuy-mint">3</p>
-                <p class="text-xs text-white/75" data-i18n="stat_districts">Madrid districts</p>
-              </div>
-              <div>
-                <p class="font-display font-extrabold text-xl sm:text-2xl text-nearbuy-mint">POS</p>
-                <p class="text-xs text-white/75" data-i18n="stat_stock">Live local stock</p>
-              </div>
-              <div>
-                <p class="font-display font-extrabold text-xl sm:text-2xl text-nearbuy-mint">0 €</p>
-                <p class="text-xs text-white/75" data-i18n="stat_shipping">Shipping or waiting</p>
-              </div>
             </div>
           </div>
 
-          <!-- Right Column: Realistic 9:19.5 Smartphone with Inline Interactive AI Chat -->
-          <div class="lg:col-span-5 flex justify-center lg:justify-end">
-            <!-- Placeholder keeps layout height stable when phone is expanded -->
-            <div class="relative flex items-center justify-center w-[300px] h-[610px]">
-              <!-- Outer Hardware Shell (overflow-visible so side buttons align perfectly) -->
-              <div
-                id="phone-shell"
-                class="phone-shell relative w-[300px] h-[610px] rounded-[46px] bg-[#14171F] p-[10px] shadow-phone border border-white/20 overflow-visible select-none"
+          <!-- Synced EN | ES Toggle & Reset -->
+          <div class="flex items-center gap-2 shrink-0">
+            <div class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 p-0.5 text-xs font-bold" role="group" aria-label="Fullscreen language switcher">
+              <button
+                type="button"
+                id="fs-lang-en"
+                onclick="setLanguage('en')"
+                class="px-2.5 py-1 rounded-full bg-nearbuy-cobalt text-white transition-colors cursor-pointer"
               >
-                <!-- Left Hardware Buttons (Mute + Vol Up + Vol Down) -->
-                <span aria-hidden="true" class="absolute -left-[3px] top-[96px] w-[3px] h-[26px] rounded-l-sm bg-[#2D3342]"></span>
-                <span aria-hidden="true" class="absolute -left-[3px] top-[142px] w-[3px] h-[48px] rounded-l-sm bg-[#2D3342]"></span>
-                <span aria-hidden="true" class="absolute -left-[3px] top-[202px] w-[3px] h-[48px] rounded-l-sm bg-[#2D3342]"></span>
+                EN
+              </button>
+              <button
+                type="button"
+                id="fs-lang-es"
+                onclick="setLanguage('es')"
+                class="px-2.5 py-1 rounded-full text-nearbuy-charcoal/70 hover:text-nearbuy-charcoal transition-colors cursor-pointer"
+              >
+                ES
+              </button>
+            </div>
 
-                <!-- Right Hardware Button (Power) -->
-                <span aria-hidden="true" class="absolute -right-[3px] top-[160px] w-[3px] h-[68px] rounded-r-sm bg-[#2D3342]"></span>
+            <button
+              type="button"
+              onclick="resetChat()"
+              title="Reset conversation"
+              aria-label="Reset conversation"
+              class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
 
-                <!-- Inner Screen Container -->
-                <div class="relative w-full h-full rounded-[37px] bg-[#F8FAFC] overflow-hidden flex flex-col text-nearbuy-charcoal select-text">
+      <!-- Centered Readable Chat Column -->
+      <div id="fs-chat-scroll" class="chat-scroll flex-1 overflow-y-auto">
+        <div id="fs-chat-messages" class="max-w-3xl mx-auto w-full px-4 sm:px-6 py-6 space-y-4">
+          <!-- Rendered dynamically by JS -->
+        </div>
+      </div>
 
-                  <!-- Status Bar + Dynamic Island -->
-                  <div class="bg-white px-5 pt-3 pb-2 flex items-center justify-between text-[11px] font-bold text-nearbuy-charcoal shrink-0 relative">
-                    <span>9:41</span>
-                    <!-- Dynamic Island -->
-                    <div class="w-[88px] h-[22px] bg-[#111318] rounded-full flex items-center justify-end px-2.5">
-                      <span class="w-2.5 h-2.5 rounded-full bg-[#1E293B] border border-slate-700"></span>
-                    </div>
-                    <!-- Signal & Battery -->
-                    <div class="flex items-center gap-1 text-nearbuy-charcoal">
-                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 20c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-5.6-4.2l1.4 1.4C9 16 10.4 15.4 12 15.4s3 .6 4.2 1.8l1.4-1.4C16 14.2 14.1 13.4 12 13.4s-4 .8-5.6 2.4zm-2.8-2.8l1.4 1.4C6.8 12.6 9.3 11.6 12 11.6s5.2 1 7 2.8l1.4-1.4C18.2 10.8 15.2 9.6 12 9.6s-6.2 1.2-8.4 3.4z"/>
-                      </svg>
-                      <div class="w-4 h-2.5 rounded-[3px] border border-nearbuy-charcoal p-[1px] flex items-center">
-                        <div class="w-full h-full bg-nearbuy-charcoal rounded-[1px]"></div>
-                      </div>
-                    </div>
-                  </div>
+      <!-- Bottom Quick Chips & Full-Width Composer -->
+      <div class="bg-white border-t border-slate-200 shrink-0">
+        <div class="max-w-3xl mx-auto w-full px-4 sm:px-6 pt-3 pb-4 sm:pb-5 space-y-2.5">
+          <div id="fs-quick-chips" class="no-scrollbar flex items-center gap-2 overflow-x-auto pb-0.5">
+            <!-- Rendered dynamically by JS -->
+          </div>
 
-                  <!-- Clean Nearbuy AI Chat Header -->
-                  <div class="bg-white border-b border-slate-200/80 px-4 py-2.5 flex items-center justify-between gap-2 shrink-0">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                      <div class="w-9 h-9 rounded-full bg-nearbuy-mint border border-nearbuy-cobalt/15 p-1 flex items-center justify-center shrink-0">
-                        <img id="phone-header-logo" alt="Nearbuy AI" class="w-full h-full object-contain" />
-                      </div>
-                      <div class="min-w-0 leading-tight">
-                        <p class="font-display font-bold text-sm text-nearbuy-charcoal truncate" data-i18n="phone_title">Nearbuy AI</p>
-                        <p class="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5 truncate">
-                          <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
-                          <span id="chat-status-text" data-i18n="phone_online">Online · Madrid</span>
-                        </p>
-                      </div>
-                    </div>
+          <form id="fs-chat-form" class="flex items-center gap-2.5">
+            <input
+              id="fs-chat-input"
+              type="text"
+              autocomplete="off"
+              placeholder="Ask for a product & area..."
+              class="flex-1 min-w-0 bg-slate-50 border border-slate-200 focus:border-nearbuy-cobalt focus:bg-white rounded-full px-5 py-3 text-sm text-nearbuy-charcoal placeholder:text-slate-400 focus:outline-none transition-colors"
+            />
+            <button
+              type="submit"
+              aria-label="Send message"
+              class="w-11 h-11 rounded-full bg-nearbuy-cobalt hover:bg-nearbuy-cobaltDark text-white flex items-center justify-center shrink-0 transition-colors cursor-pointer shadow-sm"
+            >
+              <svg class="w-5 h-5 translate-x-[1px]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 5l7 7-7 7" />
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
 
-                    <!-- Discreet Reset & Expand/Close Controls -->
-                    <div class="flex items-center gap-1 shrink-0">
-                      <button
-                        type="button"
-                        onclick="resetChat()"
-                        title="Reset chat"
-                        aria-label="Reset chat"
-                        class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
-                      >
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+  <!-- =========================================================================
+       MAIN PAGE WRAPPER (FOR CAMERA POV DIVE-IN ANIMATION)
+       ========================================================================= -->
+  <div id="page-wrapper" class="origin-center will-change-transform">
+
+    <!-- =======================================================================
+         1. HEADER (PURE WHITE #FFFFFF, STICKY)
+         ======================================================================= -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
+        <!-- Logo & Wordmark -->
+        <a href="#" class="inline-flex items-center gap-2.5 shrink-0 group">
+          <img id="header-logo-img" alt="Nearbuy Logo" class="w-9 h-9 sm:w-10 sm:h-10 object-contain transition-transform duration-200 group-hover:scale-105" />
+          <span class="font-display font-extrabold text-xl sm:text-2xl tracking-tight text-nearbuy-cobalt">Nearbuy</span>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-nearbuy-charcoal/80">
+          <a href="#mission" class="hover:text-nearbuy-cobalt transition-colors" data-i18n="nav_mission">N-commerce</a>
+          <a href="#how-it-works" class="hover:text-nearbuy-cobalt transition-colors" data-i18n="nav_how">How it works</a>
+          <a href="#for-shops" class="hover:text-nearbuy-cobalt transition-colors" data-i18n="nav_shops">For shops</a>
+        </nav>
+
+        <!-- Right Controls: Language Pill + CTA + Mobile Menu -->
+        <div class="flex items-center gap-2.5 sm:gap-3">
+          <!-- EN | ES Toggle -->
+          <div class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 p-0.5 text-xs font-bold" role="group" aria-label="Language switcher">
+            <button
+              type="button"
+              id="lang-en"
+              onclick="setLanguage('en')"
+              class="px-2.5 py-1.5 rounded-full bg-nearbuy-cobalt text-white transition-colors cursor-pointer"
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              id="lang-es"
+              onclick="setLanguage('es')"
+              class="px-2.5 py-1.5 rounded-full text-nearbuy-charcoal/70 hover:text-nearbuy-charcoal transition-colors cursor-pointer"
+            >
+              ES
+            </button>
+          </div>
+
+          <!-- Primary Cobalt CTA -->
+          <button
+            type="button"
+            onclick="openFullscreenChat()"
+            class="hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-nearbuy-cobalt hover:bg-nearbuy-cobaltDark text-white text-sm font-bold transition-colors cursor-pointer"
+            data-i18n="nav_cta"
+          >
+            Try the AI
+          </button>
+
+          <!-- Mobile Menu Button -->
+          <button
+            type="button"
+            onclick="toggleMobileMenu()"
+            aria-label="Toggle menu"
+            class="md:hidden w-10 h-10 rounded-xl border border-slate-200 text-nearbuy-charcoal flex items-center justify-center hover:bg-slate-50 transition-colors cursor-pointer"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Dropdown Menu -->
+      <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-200 px-4 py-4 space-y-2">
+        <a href="#mission" onclick="toggleMobileMenu()" class="block px-3 py-2.5 rounded-xl font-medium text-nearbuy-charcoal hover:bg-slate-50" data-i18n="nav_mission">N-commerce</a>
+        <a href="#how-it-works" onclick="toggleMobileMenu()" class="block px-3 py-2.5 rounded-xl font-medium text-nearbuy-charcoal hover:bg-slate-50" data-i18n="nav_how">How it works</a>
+        <a href="#for-shops" onclick="toggleMobileMenu()" class="block px-3 py-2.5 rounded-xl font-medium text-nearbuy-charcoal hover:bg-slate-50" data-i18n="nav_shops">For shops</a>
+        <button
+          type="button"
+          onclick="toggleMobileMenu(); openFullscreenChat();"
+          class="w-full mt-2 px-5 py-3 rounded-full bg-nearbuy-cobalt text-white font-bold text-sm"
+          data-i18n="nav_cta"
+        >
+          Try the AI
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <!-- =====================================================================
+           2. HERO SECTION (CORPORATE COBALT BLUE #304EB0)
+           ===================================================================== -->
+      <section class="bg-nearbuy-cobalt text-white py-14 sm:py-20 lg:py-24 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+
+            <!-- Left Column (7/12): Editorial Copy & CTAs -->
+            <div class="lg:col-span-7 text-center lg:text-left space-y-6">
+              <!-- Soft Translucent White/Mint Location Pill -->
+              <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 border border-nearbuy-mint/35 text-nearbuy-mint text-xs sm:text-sm font-semibold tracking-tight">
+                <span class="w-2 h-2 rounded-full bg-nearbuy-mint shrink-0"></span>
+                <span data-i18n="hero_badge">Madrid: Argüelles, Salamanca &amp; Tetuán</span>
+              </div>
+
+              <!-- Balanced Two-Line Hero Headline -->
+              <h1 class="font-display font-extrabold text-4xl sm:text-5xl xl:text-[3.35rem] leading-[1.08] tracking-tight">
+                <span class="block text-white xl:whitespace-nowrap" data-i18n="hero_title_1">The speed of e-commerce.</span>
+                <span class="block text-nearbuy-mint mt-2 xl:whitespace-nowrap" data-i18n="hero_title_2">The soul of your neighborhood.</span>
+              </h1>
+
+              <!-- Concise Subtitle -->
+              <p class="text-base sm:text-lg text-white/85 max-w-xl mx-auto lg:mx-0 leading-relaxed" data-i18n="hero_subtitle">
+                Nearbuy's AI checks real-time stock at independent Madrid shops so you find exactly what you need minutes from home—ready to pick up today.
+              </p>
+
+              <!-- Primary CTA & Secondary Link -->
+              <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                <button
+                  type="button"
+                  onclick="openFullscreenChat()"
+                  class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-white hover:bg-nearbuy-mint text-nearbuy-cobalt font-bold text-sm sm:text-base transition-colors cursor-pointer shadow-sm"
+                  data-i18n="hero_cta_primary"
+                >
+                  Try the AI assistant
+                </button>
+
+                <a
+                  href="#for-shops"
+                  class="inline-flex items-center justify-center px-3 py-2 text-sm sm:text-base font-semibold text-white/90 hover:text-nearbuy-mint transition-colors"
+                  data-i18n="hero_cta_secondary"
+                >
+                  Do you own a local shop? →
+                </a>
+              </div>
+            </div>
+
+            <!-- Right Column (5/12): Realistic 9:19.5 Smartphone (300x610) -->
+            <div class="lg:col-span-5 flex justify-center lg:justify-end">
+              <div class="relative flex items-center justify-center w-[300px] h-[610px] max-w-full">
+                <!-- Outer Hardware Chassis with macOS/iOS Hover Elevation -->
+                <div
+                  id="phone-shell"
+                  class="relative w-[300px] h-[610px] rounded-[46px] bg-[#14171F] p-[10px] shadow-phone transition-all duration-300 ease-out hover:scale-[1.04] hover:-translate-y-1.5 hover:shadow-[0_32px_70px_rgba(12,24,68,0.45)] border border-white/20 overflow-visible select-none"
+                >
+                  <!-- Left Hardware Buttons (Mute, Vol+, Vol-) -->
+                  <span aria-hidden="true" class="absolute -left-[3px] top-[102px] w-[3px] h-[28px] rounded-l bg-[#2B303D]"></span>
+                  <span aria-hidden="true" class="absolute -left-[3px] top-[148px] w-[3px] h-[48px] rounded-l bg-[#2B303D]"></span>
+                  <span aria-hidden="true" class="absolute -left-[3px] top-[208px] w-[3px] h-[48px] rounded-l bg-[#2B303D]"></span>
+
+                  <!-- Right Hardware Button (Power) -->
+                  <span aria-hidden="true" class="absolute -right-[3px] top-[166px] w-[3px] h-[66px] rounded-r bg-[#2B303D]"></span>
+
+                  <!-- Inner Smartphone Screen (#phone-screen) -->
+                  <div id="phone-screen" class="relative w-full h-full rounded-[38px] bg-[#F8FAFC] overflow-hidden flex flex-col text-nearbuy-charcoal">
+
+                    <!-- Status Bar & Dynamic Island -->
+                    <div class="bg-white px-5 pt-2.5 pb-1.5 flex items-center justify-between text-[11px] font-bold text-nearbuy-charcoal shrink-0 relative">
+                      <span>9:41</span>
+                      <div class="w-[82px] h-[21px] rounded-full bg-[#14171F] absolute left-1/2 -translate-x-1/2 top-2"></div>
+                      <div class="flex items-center gap-1.5 text-nearbuy-charcoal">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M2 18h3v3H2v-3zm5-4h3v7H7v-7zm5-4h3v11h-3V10zm5-5h3v16h-3V5z" />
                         </svg>
-                      </button>
+                        <div class="w-5 h-2.5 rounded-[3px] border border-nearbuy-charcoal p-[1px] flex items-center">
+                          <div class="w-full h-full bg-nearbuy-charcoal rounded-[1px]"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Chat App Header -->
+                    <div class="bg-white px-3.5 py-2.5 border-b border-slate-200/80 flex items-center justify-between shrink-0">
+                      <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-8 h-8 rounded-full bg-nearbuy-mint border border-nearbuy-cobalt/15 p-1 flex items-center justify-center shrink-0">
+                          <img id="phone-header-logo" alt="Nearbuy AI" class="w-full h-full object-contain" />
+                        </div>
+                        <div class="leading-tight min-w-0">
+                          <p class="font-display font-bold text-xs text-nearbuy-charcoal truncate" data-i18n="phone_title">Nearbuy AI</p>
+                          <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span id="chat-status-text" data-i18n="phone_online">Online</span>
+                          </p>
+                        </div>
+                      </div>
+
                       <button
                         type="button"
-                        id="expand-phone-btn"
-                        onclick="togglePhoneExpand()"
+                        onclick="openFullscreenChat()"
                         title="Expand chat"
                         aria-label="Expand chat"
                         class="w-7 h-7 rounded-full bg-slate-100 hover:bg-nearbuy-cobalt hover:text-white text-slate-700 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer"
@@ -364,793 +433,762 @@
                         ⤢
                       </button>
                     </div>
-                  </div>
 
-                  <!-- Scrollable Chat Messages Area -->
-                  <div id="chat-messages" class="chat-scroll flex-1 overflow-y-auto px-3.5 py-3.5 space-y-3 bg-[#F8FAFC]">
-                    <!-- Messages rendered dynamically by JS -->
-                  </div>
-
-                  <!-- Bottom Quick Chips + Input Bar + Home Indicator -->
-                  <div class="bg-white border-t border-slate-200/80 shrink-0">
-                    <!-- One-Click Quick Chips -->
-                    <div id="quick-chips" class="no-scrollbar px-3 pt-2.5 pb-1.5 flex items-center gap-1.5 overflow-x-auto">
-                      <!-- Chips rendered dynamically by JS -->
+                    <!-- Scrollable Chat Messages Area -->
+                    <div id="chat-messages" class="chat-scroll flex-1 overflow-y-auto px-3.5 py-3.5 space-y-3 bg-[#F8FAFC]">
+                      <!-- Messages rendered dynamically by JS -->
                     </div>
 
-                    <!-- Message Input Form -->
-                    <form id="chat-form" class="px-3 pb-2.5 pt-1 flex items-center gap-2">
-                      <input
-                        id="chat-input"
-                        type="text"
-                        autocomplete="off"
-                        placeholder="Ask for a product & area..."
-                        class="flex-1 min-w-0 bg-slate-50 border border-slate-200 focus:border-nearbuy-cobalt focus:bg-white rounded-full px-3.5 py-2 text-xs text-nearbuy-charcoal placeholder:text-slate-400 focus:outline-none transition-colors"
-                      />
-                      <button
-                        type="submit"
-                        aria-label="Send message"
-                        class="w-9 h-9 rounded-full bg-nearbuy-cobalt hover:bg-nearbuy-cobaltDark text-white flex items-center justify-center shrink-0 transition-colors cursor-pointer"
-                      >
-                        <svg class="w-4 h-4 translate-x-[1px]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    </form>
+                    <!-- Bottom Quick Chips + Input + Home Indicator -->
+                    <div class="bg-white border-t border-slate-200/80 shrink-0">
+                      <!-- Quick Chips -->
+                      <div id="quick-chips" class="no-scrollbar px-3 pt-2.5 pb-1.5 flex items-center gap-1.5 overflow-x-auto">
+                        <!-- Rendered dynamically by JS -->
+                      </div>
 
-                    <!-- iOS Home Indicator -->
-                    <div class="pb-2 flex justify-center">
-                      <span class="w-28 h-1 rounded-full bg-slate-300"></span>
+                      <!-- Phone Input (Clicking dives into fullscreen chat) -->
+                      <form id="chat-form" class="px-3 pb-2 pt-1 flex items-center gap-2">
+                        <input
+                          id="chat-input"
+                          type="text"
+                          readonly
+                          autocomplete="off"
+                          onclick="openFullscreenChat()"
+                          placeholder="Ask for a product & area..."
+                          class="flex-1 min-w-0 bg-slate-50 border border-slate-200 hover:border-nearbuy-cobalt rounded-full px-3.5 py-2 text-xs text-nearbuy-charcoal placeholder:text-slate-400 focus:outline-none transition-colors cursor-pointer"
+                        />
+                        <button
+                          type="button"
+                          onclick="openFullscreenChat()"
+                          aria-label="Open Nearbuy AI chat"
+                          class="w-8 h-8 rounded-full bg-nearbuy-cobalt hover:bg-nearbuy-cobaltDark text-white flex items-center justify-center shrink-0 transition-colors cursor-pointer"
+                        >
+                          <svg class="w-4 h-4 translate-x-[1px]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      </form>
+
+                      <!-- Bottom Home Indicator -->
+                      <div class="pb-2 pt-1 flex justify-center">
+                        <div class="w-28 h-1 rounded-full bg-slate-300"></div>
+                      </div>
                     </div>
                   </div>
-
                 </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           3. MISSION / N-COMMERCE SECTION (PURE WHITE #FFFFFF)
+           ===================================================================== -->
+      <section id="mission" class="bg-white text-nearbuy-charcoal py-16 sm:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          <!-- Section Header -->
+          <div class="max-w-2xl space-y-3 mb-12">
+            <span class="inline-block px-3.5 py-1 rounded-full bg-nearbuy-mint text-nearbuy-cobalt text-xs font-extrabold tracking-wider uppercase" data-i18n="mission_eyebrow">
+              N-COMMERCE · NEARBY COMMERCE
+            </span>
+            <h2 class="font-display font-extrabold text-3xl sm:text-4xl leading-[1.14] tracking-tight text-nearbuy-charcoal" data-i18n="mission_title">
+              Cities shouldn't all look the same.
+            </h2>
+            <p class="text-base text-slate-600 leading-relaxed" data-i18n="mission_desc">
+              Global chains and next-day delivery giants are turning vibrant streets into identical corridors. Nearbuy champions independent, family-run shops—bringing their real shelves online so your neighborhood stays alive.
+            </p>
+          </div>
+
+          <!-- 2-Column Editorial Split -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+
+            <!-- Left Column: Authentic Nearbuy Bags Photo + Compact Comparison Card -->
+            <div class="lg:col-span-6 space-y-6">
+              <div class="rounded-3xl overflow-hidden bg-nearbuy-cobalt shadow-md border border-slate-200/70">
+                <img
+                  id="bags-photo-img"
+                  alt="Nearbuy — Find everything, nearby."
+                  class="w-full h-auto object-cover block"
+                />
+              </div>
+
+              <!-- Compact Comparison Card -->
+              <div class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="rounded-xl bg-white border border-slate-200/90 p-4 space-y-2.5">
+                  <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400" data-i18n="comp_old_label">Traditional E-commerce</p>
+                  <ul class="space-y-2 text-xs text-slate-600">
+                    <li class="flex items-start gap-2">
+                      <span class="text-slate-400 font-bold">✕</span>
+                      <span data-i18n="comp_old_1">24–48h waits &amp; excess cardboard</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <span class="text-slate-400 font-bold">✕</span>
+                      <span data-i18n="comp_old_2">Drains local street foot traffic</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <span class="text-slate-400 font-bold">✕</span>
+                      <span data-i18n="comp_old_3">No local specialist advice</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="rounded-xl bg-nearbuy-cobalt text-white p-4 space-y-2.5">
+                  <p class="text-[11px] font-extrabold uppercase tracking-wider text-nearbuy-mint" data-i18n="comp_new_label">N-commerce · Nearbuy</p>
+                  <ul class="space-y-2 text-xs text-white/95">
+                    <li class="flex items-start gap-2">
+                      <span class="text-nearbuy-mint font-bold">✓</span>
+                      <span data-i18n="comp_new_1">In-stock items minutes on foot</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <span class="text-nearbuy-mint font-bold">✓</span>
+                      <span data-i18n="comp_new_2">Directly fuels Madrid families</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <span class="text-nearbuy-mint font-bold">✓</span>
+                      <span data-i18n="comp_new_3">Zero boxes, pickup today</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: 3 Crisp Editorial Pillars -->
+            <div class="lg:col-span-6 space-y-5">
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 space-y-2">
+                <div class="flex items-center gap-3">
+                  <span class="w-9 h-9 rounded-xl bg-nearbuy-mint text-nearbuy-cobalt font-display font-extrabold text-sm flex items-center justify-center shrink-0">01</span>
+                  <h3 class="font-display font-bold text-lg text-nearbuy-charcoal" data-i18n="pillar_1_title">Real-time local stock</h3>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed pl-12" data-i18n="pillar_1_desc">
+                  Know what is genuinely sitting on a nearby shelf right now—with transparent prices, real photos, and live opening hours before you step outside.
+                </p>
+              </div>
+
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 space-y-2">
+                <div class="flex items-center gap-3">
+                  <span class="w-9 h-9 rounded-xl bg-nearbuy-mint text-nearbuy-cobalt font-display font-extrabold text-sm flex items-center justify-center shrink-0">02</span>
+                  <h3 class="font-display font-bold text-lg text-nearbuy-charcoal" data-i18n="pillar_2_title">Alive neighborhoods</h3>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed pl-12" data-i18n="pillar_2_desc">
+                  Specialty boutiques, independent toy shops, and artisan florists give Madrid its character. Every local purchase keeps your streets distinct and thriving.
+                </p>
+              </div>
+
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 space-y-2">
+                <div class="flex items-center gap-3">
+                  <span class="w-9 h-9 rounded-xl bg-nearbuy-mint text-nearbuy-cobalt font-display font-extrabold text-sm flex items-center justify-center shrink-0">03</span>
+                  <h3 class="font-display font-bold text-lg text-nearbuy-charcoal" data-i18n="pillar_3_title">Support local families</h3>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed pl-12" data-i18n="pillar_3_desc">
+                  Keep spending circulating in your community instead of distant fulfillment warehouses—getting instant human advice and zero packaging waste.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           4. HOW IT WORKS SECTION (CORPORATE COBALT BLUE #304EB0)
+           ===================================================================== -->
+      <section id="how-it-works" class="bg-nearbuy-cobalt text-white py-16 sm:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="max-w-2xl space-y-3 mb-12">
+            <span class="inline-block px-3.5 py-1 rounded-full bg-nearbuy-mint text-nearbuy-charcoal text-xs font-extrabold tracking-wider uppercase" data-i18n="how_eyebrow">
+              HOW IT WORKS
+            </span>
+            <h2 class="font-display font-extrabold text-3xl sm:text-4xl tracking-tight text-white" data-i18n="how_title">
+              From search to storefront in 3 steps.
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Step 01 -->
+            <div class="rounded-3xl bg-white/10 border border-white/20 p-7 flex flex-col justify-between space-y-5">
+              <span class="inline-flex w-11 h-11 rounded-2xl bg-nearbuy-mint text-nearbuy-cobalt font-display font-extrabold text-base items-center justify-center">01</span>
+              <div class="space-y-2">
+                <h3 class="font-display font-bold text-xl text-white" data-i18n="step_1_title">Ask naturally</h3>
+                <p class="text-sm text-white/80 leading-relaxed" data-i18n="step_1_desc">
+                  Tell Nearbuy what you need and which neighborhood you're in—just like texting a local friend.
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 02 -->
+            <div class="rounded-3xl bg-white/10 border border-white/20 p-7 flex flex-col justify-between space-y-5">
+              <span class="inline-flex w-11 h-11 rounded-2xl bg-nearbuy-mint text-nearbuy-cobalt font-display font-extrabold text-base items-center justify-center">02</span>
+              <div class="space-y-2">
+                <h3 class="font-display font-bold text-xl text-white" data-i18n="step_2_title">Verified stock nearby</h3>
+                <p class="text-sm text-white/80 leading-relaxed" data-i18n="step_2_desc">
+                  Our AI matches your query against live inventories from independent stores in Argüelles, Salamanca &amp; Tetuán.
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 03 -->
+            <div class="rounded-3xl bg-white/10 border border-white/20 p-7 flex flex-col justify-between space-y-5">
+              <span class="inline-flex w-11 h-11 rounded-2xl bg-nearbuy-mint text-nearbuy-cobalt font-display font-extrabold text-base items-center justify-center">03</span>
+              <div class="space-y-2">
+                <h3 class="font-display font-bold text-xl text-white" data-i18n="step_3_title">Walk in &amp; pick it up today</h3>
+                <p class="text-sm text-white/80 leading-relaxed" data-i18n="step_3_desc">
+                  Check exact prices, product photos, opening hours, and tap Google Maps to walk straight to the shop.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           5. FOR LOCAL SHOPS SECTION (PURE WHITE #FFFFFF)
+           ===================================================================== -->
+      <section id="for-shops" class="bg-white text-nearbuy-charcoal py-16 sm:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+
+          <!-- Section Header -->
+          <div class="max-w-2xl space-y-3">
+            <span class="inline-block px-3.5 py-1 rounded-full bg-nearbuy-mint text-nearbuy-cobalt text-xs font-extrabold tracking-wider uppercase" data-i18n="shops_eyebrow">
+              FOR LOCAL SHOPS
+            </span>
+            <h2 class="font-display font-extrabold text-3xl sm:text-4xl tracking-tight text-nearbuy-charcoal" data-i18n="shops_title">
+              Turn your existing POS into online visibility.
+            </h2>
+            <p class="text-base text-slate-600 leading-relaxed" data-i18n="shops_desc">
+              No manual catalog uploads or extra software to learn. Nearbuy connects directly to the digital inventory already running on your POS / TPV system.
+            </p>
+          </div>
+
+          <!-- 4-Step Horizontal Visual POS Pipeline -->
+          <div class="rounded-3xl border border-slate-200 bg-slate-50/80 p-5 sm:p-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+              <div class="rounded-2xl bg-white border border-slate-200 p-4 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-full bg-nearbuy-mint text-nearbuy-cobalt font-display font-extrabold text-xs flex items-center justify-center shrink-0">1</span>
+                <span class="font-bold text-sm text-nearbuy-charcoal" data-i18n="tpv_1">Your current POS (TPV)</span>
+              </div>
+              <div class="rounded-2xl bg-white border border-slate-200 p-4 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-full bg-nearbuy-mint text-nearbuy-cobalt font-display font-extrabold text-xs flex items-center justify-center shrink-0">2</span>
+                <span class="font-bold text-sm text-nearbuy-charcoal" data-i18n="tpv_2">Automated stock export</span>
+              </div>
+              <div class="rounded-2xl bg-white border border-slate-200 p-4 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-full bg-nearbuy-mint text-nearbuy-cobalt font-display font-extrabold text-xs flex items-center justify-center shrink-0">3</span>
+                <span class="font-bold text-sm text-nearbuy-charcoal" data-i18n="tpv_3">Visible on Nearbuy AI</span>
+              </div>
+              <div class="rounded-2xl bg-nearbuy-cobalt text-white p-4 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-full bg-nearbuy-mint text-nearbuy-cobalt font-display font-extrabold text-xs flex items-center justify-center shrink-0">4</span>
+                <span class="font-bold text-sm" data-i18n="tpv_4">Walk-in customers today</span>
               </div>
             </div>
           </div>
 
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================
-         3. BLOCK 2 — N-COMMERCE MANIFESTO (PURE WHITE #FFFFFF)
-         ========================================================= -->
-    <section id="n-commerce" class="bg-white py-20 sm:py-24 lg:py-28">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
-        <!-- 2-Column Top Layout: Editorial Copy + Real Nearbuy Bags Photo -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-          <div class="lg:col-span-7 space-y-6">
-            <span class="inline-flex items-center px-3.5 py-1.5 rounded-full bg-nearbuy-mint text-nearbuy-cobalt text-xs font-bold uppercase tracking-[0.14em]" data-i18n="mission_eyebrow">
-              THE N-COMMERCE MOVEMENT
-            </span>
-
-            <h2 class="font-display font-extrabold text-3xl sm:text-4xl lg:text-[2.9rem] leading-[1.06] tracking-[-0.025em] text-nearbuy-charcoal" data-i18n="mission_headline">
-              N-commerce: buy today, without erasing your city.
-            </h2>
-
-            <div class="space-y-4 text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl">
-              <p data-i18n="mission_p1">
-                When mega-chains and e-commerce take over every street, cities lose their identity and lifelong family shops disappear.
+          <!-- Strictly Symmetric 3-Column Feature Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="rounded-3xl border border-slate-200 bg-white p-7 flex flex-col justify-between space-y-3 shadow-sm">
+              <div class="w-10 h-10 rounded-xl bg-nearbuy-mint text-nearbuy-cobalt flex items-center justify-center font-bold">✓</div>
+              <h3 class="font-display font-bold text-lg text-nearbuy-charcoal" data-i18n="shop_feat_1_title">Automated POS sync</h3>
+              <p class="text-sm text-slate-600 leading-relaxed" data-i18n="shop_feat_1_desc">
+                Syncs your digital inventory directly from your existing TPV/POS without manual uploads or spreadsheets.
               </p>
-              <p data-i18n="mission_p2">
-                Nearbuy Commerce puts neighborhoods first: the digital speed you expect today, connected directly to the independent specialty shops that keep Madrid alive.
+            </div>
+
+            <div class="rounded-3xl border border-slate-200 bg-white p-7 flex flex-col justify-between space-y-3 shadow-sm">
+              <div class="w-10 h-10 rounded-xl bg-nearbuy-mint text-nearbuy-cobalt flex items-center justify-center font-bold">✓</div>
+              <h3 class="font-display font-bold text-lg text-nearbuy-charcoal" data-i18n="shop_feat_2_title">Live in 5 minutes</h3>
+              <p class="text-sm text-slate-600 leading-relaxed" data-i18n="shop_feat_2_desc">
+                Connect your store profile, opening hours, and inventory feed in minutes—zero technical skills needed.
+              </p>
+            </div>
+
+            <div class="rounded-3xl border border-slate-200 bg-white p-7 flex flex-col justify-between space-y-3 shadow-sm">
+              <div class="w-10 h-10 rounded-xl bg-nearbuy-mint text-nearbuy-cobalt flex items-center justify-center font-bold">✓</div>
+              <h3 class="font-display font-bold text-lg text-nearbuy-charcoal" data-i18n="shop_feat_3_title">Direct foot traffic</h3>
+              <p class="text-sm text-slate-600 leading-relaxed" data-i18n="shop_feat_3_desc">
+                Brings high-intent neighborhood buyers straight to your door—zero shipping headaches or logistics.
               </p>
             </div>
           </div>
 
-          <div class="lg:col-span-5">
-            <div class="rounded-2xl overflow-hidden shadow-lg border border-slate-200/80 bg-nearbuy-cobalt">
-              <img
-                id="bags-photo-img"
-                alt="Nearbuy shopping bags — Find everything, nearby."
-                class="w-full h-auto object-cover block"
-              />
+          <!-- Clean CTA Bar -->
+          <div class="rounded-3xl border border-slate-200 bg-slate-50/80 p-6 sm:p-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <p class="font-display font-bold text-lg text-nearbuy-charcoal" data-i18n="shops_bar_title">Ready to put your neighborhood store on Nearbuy?</p>
+              <p class="text-sm text-slate-600" data-i18n="shops_bar_sub">Currently onboarding independent shops across Argüelles, Salamanca &amp; Tetuán.</p>
             </div>
+            <a
+              id="merchant-portal-cta"
+              href="#for-shops"
+              class="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-nearbuy-cobalt hover:bg-nearbuy-cobaltDark text-white font-bold text-sm sm:text-base transition-colors shadow-sm shrink-0"
+              data-i18n="shops_cta"
+            >
+              Join as a local shop →
+            </a>
           </div>
+
         </div>
+      </section>
+    </main>
 
-        <!-- 3 Concise Editorial Pillars -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="rounded-2xl border border-slate-200 bg-white p-7 shadow-card space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-nearbuy-mint text-nearbuy-cobalt flex items-center justify-center">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M4 21V9l8-5 8 5v12M9 21v-6h6v6" />
-              </svg>
-            </div>
-            <h3 class="font-display font-bold text-xl text-nearbuy-charcoal" data-i18n="pillar1_title">Living identity</h3>
-            <p class="text-sm sm:text-base text-slate-600 leading-relaxed" data-i18n="pillar1_desc">
-              Unique streets filled with specialty shops, not identical corporate clones.
-            </p>
-          </div>
-
-          <div class="rounded-2xl border border-slate-200 bg-white p-7 shadow-card space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-nearbuy-mint text-nearbuy-cobalt flex items-center justify-center">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 class="font-display font-bold text-xl text-nearbuy-charcoal" data-i18n="pillar2_title">Real stock, zero waiting</h3>
-            <p class="text-sm sm:text-base text-slate-600 leading-relaxed" data-i18n="pillar2_desc">
-              In your hands within a 10-minute walk—no cardboard boxes or 48h shipping.
-            </p>
-          </div>
-
-          <div class="rounded-2xl border border-slate-200 bg-white p-7 shadow-card space-y-3">
-            <div class="w-10 h-10 rounded-xl bg-nearbuy-mint text-nearbuy-cobalt flex items-center justify-center">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </div>
-            <h3 class="font-display font-bold text-xl text-nearbuy-charcoal" data-i18n="pillar3_title">Neighborhood economy</h3>
-            <p class="text-sm sm:text-base text-slate-600 leading-relaxed" data-i18n="pillar3_desc">
-              Every purchase directly supports local families and independent shopkeepers.
-            </p>
-          </div>
-        </div>
-
-        <!-- Compact Side-by-Side Comparison Card -->
-        <div class="rounded-2xl border border-slate-200 bg-[#F8FAFC] p-6 sm:p-8">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="rounded-xl bg-white border border-slate-200/90 p-5 sm:p-6 space-y-3">
-              <p class="text-xs font-bold uppercase tracking-[0.14em] text-slate-400" data-i18n="cmp_ecom_label">Traditional E-commerce</p>
-              <ul class="space-y-2.5 text-sm text-slate-600">
-                <li class="flex items-start gap-2.5">
-                  <span class="text-slate-400 font-bold mt-0.5">✕</span>
-                  <span data-i18n="cmp_ecom_1">24–48h delivery vans, packaging waste, and shipping fees.</span>
-                </li>
-                <li class="flex items-start gap-2.5">
-                  <span class="text-slate-400 font-bold mt-0.5">✕</span>
-                  <span data-i18n="cmp_ecom_2">Value leaves the neighborhood toward distant mega-warehouses.</span>
-                </li>
-                <li class="flex items-start gap-2.5">
-                  <span class="text-slate-400 font-bold mt-0.5">✕</span>
-                  <span data-i18n="cmp_ecom_3">Homogenized streets as independent shops close their doors.</span>
-                </li>
-              </ul>
-            </div>
-
-            <div class="rounded-xl bg-nearbuy-cobalt text-white p-5 sm:p-6 space-y-3">
-              <p class="text-xs font-bold uppercase tracking-[0.14em] text-nearbuy-mint" data-i18n="cmp_ncom_label">N-commerce · Nearbuy</p>
-              <ul class="space-y-2.5 text-sm text-white/90">
-                <li class="flex items-start gap-2.5">
-                  <span class="text-nearbuy-mint font-bold mt-0.5">✓</span>
-                  <span data-i18n="cmp_ncom_1">In your hands in minutes on foot—zero shipping, zero boxes.</span>
-                </li>
-                <li class="flex items-start gap-2.5">
-                  <span class="text-nearbuy-mint font-bold mt-0.5">✓</span>
-                  <span data-i18n="cmp_ncom_2">100% of your spend strengthens local families and neighborhood life.</span>
-                </li>
-                <li class="flex items-start gap-2.5">
-                  <span class="text-nearbuy-mint font-bold mt-0.5">✓</span>
-                  <span data-i18n="cmp_ncom_3">AI-powered discovery for specialty stores with live POS stock.</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================
-         4. BLOCK 3 — HOW IT WORKS (SOLID COBALT BLUE #304EB0)
-         ========================================================= -->
-    <section id="how-it-works" class="bg-nearbuy-cobalt text-white py-20 sm:py-24 lg:py-28">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
-        <div class="max-w-2xl space-y-3">
-          <p class="text-xs sm:text-sm font-bold uppercase tracking-[0.16em] text-nearbuy-mint" data-i18n="how_eyebrow">
-            HOW IT WORKS
-          </p>
-          <h2 class="font-display font-extrabold text-3xl sm:text-4xl lg:text-[2.75rem] leading-[1.08] tracking-[-0.025em] text-white" data-i18n="how_headline">
-            From your phone to your local shop in three steps.
-          </h2>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Step 01 -->
-          <div class="rounded-2xl bg-white/10 border border-white/15 p-8 space-y-4">
-            <span class="font-display font-extrabold text-4xl text-nearbuy-mint leading-none block">01</span>
-            <h3 class="font-display font-bold text-xl sm:text-2xl text-white" data-i18n="step1_title">
-              Ask naturally
-            </h3>
-            <p class="text-sm sm:text-base text-white/80 leading-relaxed" data-i18n="step1_desc">
-              Tell Nearbuy AI what you need and your street or neighborhood in Madrid.
-            </p>
-          </div>
-
-          <!-- Step 02 -->
-          <div class="rounded-2xl bg-white/10 border border-white/15 p-8 space-y-4">
-            <span class="font-display font-extrabold text-4xl text-nearbuy-mint leading-none block">02</span>
-            <h3 class="font-display font-bold text-xl sm:text-2xl text-white" data-i18n="step2_title">
-              Real local stock
-            </h3>
-            <p class="text-sm sm:text-base text-white/80 leading-relaxed" data-i18n="step2_desc">
-              We match nearby independent shops with live POS availability, product photos, and opening hours.
-            </p>
-          </div>
-
-          <!-- Step 03 -->
-          <div class="rounded-2xl bg-white/10 border border-white/15 p-8 space-y-4">
-            <span class="font-display font-extrabold text-4xl text-nearbuy-mint leading-none block">03</span>
-            <h3 class="font-display font-bold text-xl sm:text-2xl text-white" data-i18n="step3_title">
-              Walk in &amp; pick up
-            </h3>
-            <p class="text-sm sm:text-base text-white/80 leading-relaxed" data-i18n="step3_desc">
-              Follow the direct Google Maps walking route and take it home today with zero shipping.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================
-         5. BLOCK 4 — FOR LOCAL MERCHANTS (PURE WHITE #FFFFFF)
-         ========================================================= -->
-    <section id="merchants" class="bg-white py-20 sm:py-24 lg:py-28">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        <!-- Section Header -->
-        <div class="max-w-3xl space-y-3.5">
-          <span class="inline-flex items-center px-3.5 py-1.5 rounded-full bg-nearbuy-mint text-nearbuy-cobalt text-xs font-bold uppercase tracking-[0.14em]" data-i18n="b2b_eyebrow">
-            FOR LOCAL MERCHANTS
-          </span>
-          <h2 class="font-display font-extrabold text-3xl sm:text-4xl lg:text-[2.85rem] leading-[1.06] tracking-[-0.025em] text-nearbuy-charcoal" data-i18n="b2b_headline">
-            Your physical shop, visible on every neighbor's phone.
-          </h2>
-          <p class="text-base sm:text-lg text-slate-600 leading-relaxed" data-i18n="b2b_subtitle">
-            Connect your real inventory without changing how you work and attract nearby shoppers already looking for what you sell today.
-          </p>
-        </div>
-
-        <!-- Horizontal Visual POS/TPV Sync Flow -->
-        <div class="rounded-2xl bg-[#F4F7FC] border border-nearbuy-cobalt/15 p-5 sm:p-6">
-          <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4 text-sm font-semibold text-nearbuy-cobalt">
-            <div class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white border border-slate-200/90 text-center">
-              <span class="w-6 h-6 rounded-full bg-nearbuy-mint text-nearbuy-cobalt text-xs font-bold flex items-center justify-center shrink-0">1</span>
-              <span data-i18n="tpv_step1">Your existing POS</span>
-            </div>
-            <span class="hidden md:inline text-nearbuy-cobalt/50 font-bold" aria-hidden="true">→</span>
-            <div class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white border border-slate-200/90 text-center">
-              <span class="w-6 h-6 rounded-full bg-nearbuy-mint text-nearbuy-cobalt text-xs font-bold flex items-center justify-center shrink-0">2</span>
-              <span data-i18n="tpv_step2">Automated inventory export</span>
-            </div>
-            <span class="hidden md:inline text-nearbuy-cobalt/50 font-bold" aria-hidden="true">→</span>
-            <div class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white border border-slate-200/90 text-center">
-              <span class="w-6 h-6 rounded-full bg-nearbuy-mint text-nearbuy-cobalt text-xs font-bold flex items-center justify-center shrink-0">3</span>
-              <span data-i18n="tpv_step3">Live on Nearbuy AI</span>
-            </div>
-            <span class="hidden md:inline text-nearbuy-cobalt/50 font-bold" aria-hidden="true">→</span>
-            <div class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-nearbuy-cobalt text-white text-center">
-              <span class="w-6 h-6 rounded-full bg-white/20 text-white text-xs font-bold flex items-center justify-center shrink-0">4</span>
-              <span data-i18n="tpv_step4">Customers at your door</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Strictly Symmetrical 3-Column Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="h-full rounded-2xl border border-slate-200 bg-white p-7 shadow-card flex flex-col gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-nearbuy-cobalt/10 text-nearbuy-cobalt flex items-center justify-center shrink-0">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </div>
-            <h3 class="font-display font-bold text-xl text-nearbuy-charcoal" data-i18n="b2b_c1_title">
-              Automated POS Sync
-            </h3>
-            <p class="text-sm sm:text-base text-slate-600 leading-relaxed" data-i18n="b2b_c1_desc">
-              Automated export of your digital inventory straight from your POS (TPV)—no manual product uploads.
-            </p>
-          </div>
-
-          <div class="h-full rounded-2xl border border-slate-200 bg-white p-7 shadow-card flex flex-col gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-nearbuy-cobalt/10 text-nearbuy-cobalt flex items-center justify-center shrink-0">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h3 class="font-display font-bold text-xl text-nearbuy-charcoal" data-i18n="b2b_c2_title">
-              5-Minute Onboarding
-            </h3>
-            <p class="text-sm sm:text-base text-slate-600 leading-relaxed" data-i18n="b2b_c2_desc">
-              Connect your catalog and opening hours without changing your workflow or paying abusive fees.
-            </p>
-          </div>
-
-          <div class="h-full rounded-2xl border border-slate-200 bg-white p-7 shadow-card flex flex-col gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-nearbuy-cobalt/10 text-nearbuy-cobalt flex items-center justify-center shrink-0">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <h3 class="font-display font-bold text-xl text-nearbuy-charcoal" data-i18n="b2b_c3_title">
-              Direct Foot Traffic
-            </h3>
-            <p class="text-sm sm:text-base text-slate-600 leading-relaxed" data-i18n="b2b_c3_desc">
-              Neighbors searching for exactly what you have in stock are guided straight to your doorstep.
-            </p>
-          </div>
-        </div>
-
-        <!-- Bottom CTA Bar with Cobalt Blue Button -->
-        <div class="rounded-2xl bg-[#F8FAFC] border border-slate-200 p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
-          <div class="space-y-1">
-            <p class="font-display font-bold text-xl text-nearbuy-charcoal" data-i18n="b2b_box_title">
-              Do you run an independent shop in Madrid?
-            </p>
-            <p class="text-sm text-slate-600" data-i18n="b2b_note">
-              Pilot program open in Argüelles, Salamanca &amp; Tetuán.
-            </p>
-          </div>
-
-          <a
-            id="b2b-portal-cta"
-            href="#merchants"
-            onclick="handleMerchantLink(event)"
-            class="w-full sm:w-auto inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-nearbuy-cobalt hover:bg-nearbuy-cobaltDark text-white font-bold text-sm sm:text-base transition-colors shrink-0"
-            data-i18n="b2b_cta"
-          >
-            Open Merchant Portal →
-          </a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- =========================================================
-       6. FOOTER (CHARCOAL #1E1E1E)
-       ========================================================= -->
-  <footer class="bg-nearbuy-charcoal text-white py-14">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-3 items-start md:items-center gap-10 pb-10 border-b border-white/10">
-        <!-- Left: Official Logo in Crisp White Badge + Slogan -->
-        <div class="space-y-2.5 text-center md:text-left">
-          <div class="flex items-center justify-center md:justify-start gap-3">
-            <div class="w-10 h-10 rounded-xl bg-white p-1.5 flex items-center justify-center shrink-0">
+    <!-- =======================================================================
+         6. FOOTER (CHARCOAL #1E1E1E)
+         ======================================================================= -->
+    <footer class="bg-nearbuy-charcoal text-white py-12 sm:py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 pb-8 border-b border-white/10">
+          <!-- Brand & Tagline -->
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-white p-1.5 flex items-center justify-center shrink-0">
               <img id="footer-logo-img" alt="Nearbuy" class="w-full h-full object-contain" />
             </div>
-            <span class="font-display font-bold text-2xl tracking-tight text-white">Nearbuy</span>
+            <div>
+              <p class="font-display font-extrabold text-xl tracking-tight text-white">Nearbuy</p>
+              <p class="text-sm text-white/65" data-i18n="footer_tagline">Find everything, nearby.</p>
+            </div>
           </div>
-          <p class="text-sm font-medium text-slate-300">Find everything, nearby.</p>
-          <p class="text-xs text-slate-400" data-i18n="hero_badge">Madrid: Argüelles, Salamanca &amp; Tetuán</p>
-        </div>
 
-        <!-- Center: Navigation & Legal Modal Triggers -->
-        <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm font-medium text-slate-300">
-          <a href="#n-commerce" class="hover:text-white transition-colors" data-i18n="nav_ncommerce">N-commerce</a>
-          <a href="#how-it-works" class="hover:text-white transition-colors" data-i18n="nav_how">How it works</a>
-          <button type="button" onclick="openLegalModal('terms')" class="hover:text-white transition-colors cursor-pointer" data-i18n="footer_terms">Terms &amp; Conditions</button>
-          <button type="button" onclick="openLegalModal('privacy')" class="hover:text-white transition-colors cursor-pointer" data-i18n="footer_privacy">Privacy Policy</button>
-        </div>
-
-        <!-- Right: Cobalt Blue Instagram Button -->
-        <div class="flex justify-center md:justify-end">
+          <!-- Cobalt Blue Instagram Pill -->
           <a
             id="instagram-link"
             href="https://www.instagram.com/nearbuyspain/"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-nearbuy-cobalt hover:bg-nearbuy-cobaltDark text-white text-sm font-semibold transition-colors"
+            class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-nearbuy-cobalt hover:bg-nearbuy-cobaltDark text-white text-sm font-bold transition-colors"
           >
             <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
             </svg>
             <span>@nearbuyspain</span>
           </a>
         </div>
-      </div>
 
-      <!-- Bottom Copyright -->
-      <div class="pt-7 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
-        <p>© 2026 Nearbuy · N-commerce Madrid</p>
-        <p data-i18n="footer_made">Independent local commerce powered by AI.</p>
+        <div class="pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-white/60">
+          <p data-i18n="footer_copy">© 2026 Nearbuy · N-commerce Madrid. All rights reserved.</p>
+          <div class="flex items-center gap-6">
+            <button type="button" onclick="openLegalModal('terms')" class="hover:text-white transition-colors cursor-pointer" data-i18n="footer_terms">Terms &amp; Conditions</button>
+            <button type="button" onclick="openLegalModal('privacy')" class="hover:text-white transition-colors cursor-pointer" data-i18n="footer_privacy">Privacy Policy</button>
+          </div>
+        </div>
       </div>
-    </div>
-  </footer>
+    </footer>
 
-  <!-- =========================================================
-       BILINGUAL LEGAL & MERCHANT PORTAL MODAL
-       ========================================================= -->
-  <div
-    id="legal-modal"
-    onclick="handleLegalBackdropClick(event)"
-    class="legal-backdrop fixed inset-0 z-[70] bg-nearbuy-charcoal/70 backdrop-blur-sm flex items-center justify-center p-4"
-    aria-hidden="true"
-  >
-    <div class="legal-dialog w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
-      <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-4">
-        <h3 id="legal-modal-title" class="font-display font-bold text-lg text-nearbuy-cobalt">Information</h3>
+  </div> <!-- End #page-wrapper -->
+
+  <!-- =========================================================================
+       7. BILINGUAL LEGAL MODAL (TERMS & PRIVACY)
+       ========================================================================= -->
+  <div id="legal-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" aria-hidden="true" onclick="if (event.target === this) closeLegalModal()">
+    <div id="legal-modal-card" class="bg-white rounded-3xl max-w-2xl w-full max-h-[82vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between gap-4">
+        <h3 id="legal-modal-title" class="font-display font-extrabold text-xl text-nearbuy-charcoal">Terms &amp; Conditions</h3>
         <button
           type="button"
           onclick="closeLegalModal()"
-          class="p-2 rounded-full hover:bg-slate-200/80 text-nearbuy-charcoal cursor-pointer"
-          aria-label="Close"
+          aria-label="Close modal"
+          class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-nearbuy-charcoal flex items-center justify-center font-bold cursor-pointer transition-colors"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          ✕
         </button>
       </div>
-      <div id="legal-modal-body" class="p-6 max-h-[65vh] overflow-y-auto text-sm text-slate-700 leading-relaxed space-y-3.5"></div>
-      <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end">
-        <button
-          type="button"
-          onclick="closeLegalModal()"
-          class="px-5 py-2.5 rounded-full bg-nearbuy-cobalt hover:bg-nearbuy-cobaltDark text-white text-sm font-semibold transition-colors cursor-pointer"
-          data-i18n="modal_close"
-        >
-          Got it
-        </button>
+      <div id="legal-modal-body" class="p-6 overflow-y-auto text-sm text-slate-600 leading-relaxed space-y-4">
+        <!-- Rendered dynamically by JS -->
       </div>
     </div>
   </div>
 
-  <!-- =========================================================
-       APPLICATION JAVASCRIPT (SELF-CONTAINED & PRODUCTION-READY)
-       ========================================================= -->
+  <!-- =========================================================================
+       APPLICATION SCRIPT (CONFIG, EMBEDDED ASSETS, CATALOG, I18N, MACOS ZOOM)
+       ========================================================================= -->
   <script>
     // =========================================================================
-    // 1. CONFIGURATION CONSTANTS
+    // 1. CONFIGURABLE CONSTANTS (READY FOR FASTAPI / BACKEND INTEGRATION)
     // =========================================================================
     const BACKEND_API_URL = "";
-    const MERCHANT_PORTAL_URL = "#merchants";
+    const MERCHANT_PORTAL_URL = "#for-shops";
     const INSTAGRAM_URL = "https://www.instagram.com/nearbuyspain/";
 
-    // Official Embedded Brand Assets (Base64)
-    const MASCOT_DATA_URI = "data:image/png;base64,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";
+    // =========================================================================
+    // 2. EMBEDDED OFFICIAL BRAND ASSETS & FALLBACK SVG
+    // =========================================================================
+    const MASCOT_IMG = "data:image/png;base64,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";
 
-    const BAGS_DATA_URI = "data:image/webp;base64,UklGRi4TAABXRUJQVlA4ICITAACQeACdASoIAjkBPmEwlEgkIqIlo1Jo2LAMCWdu4WmgzlhLyObOJ+Azsh+nrcF86dp2FPMtr69X63juRPu6v+H56eGsvzAH+id55q498+j7xNvt3/R9g3xjdP4g6s/J+u8DxZsNPclD7k3/bGpPiAWCMbDX6s/m5M9BNii27I4Gn2pcC5Ya/VuxinP8pL2XkrM/6tAqEX6s/pHLRqPho73cx2ma/mLrFi3GLMGvx/nrXsO9P3jFLYyC+lxtGxDb7mJfW+EV4RATAzXfHQCNMivciNKmygP0aNc2Qzkn/vzzvkVlxh7l413p8CztpcYb6Ns8KUg6Ai6Mtjfm4nsiSJEBIg+zKMWAyyZkDF0o7KiQPfKhS/dsfSfjYw0EGmXesVQ81JZ4vxlDzMnIB0h3bhLi3jQ52LKnNAk96yastLwkx1iRsoHPxPS/vKHikOma/W5rv1H928K+QqmqFh+3K4156LqAeumTwK4cC9DYJ4D52uCosAnFtEIEN5ZqYv1aPcZocO2+a/UJ5jJObVtcjFDmNkiBlIP9BsUJAT1Ir9rPMWyl0wsYnv6jKWbQ4BXM71JYm7BsceFHy0JEBIgJDfE+2JVJiuK1VgI3ik7ZSmn2UwFAVRTYWhFporjx8tKfWlYk1ctttDGP0mp/6X11DNoZtC4Y5/UQbe378NKeV2KU88IEAsSuXiOkeCk1iKeFXFa+4RhaUADC43t8WXz7iRkyuERXY3zaiIjRFCGAHGVcnYB0XFhkqR1Ua5xYEoyBP08UiAkQXmBCthSQHpjC1cwMbBO94WwpA7WvRyf42KhSTg/P3qGujniDPP2pf7OmJsP30a90LdxDNoZtC3qQL4Iqxp+XJfnPSaDh0thbuVStVOWmFwCSDcLcZOz5AUJmcoBbxcmgw0IILWkm9836RASICRBnUTPVxDPMO0YVKwiPvaD8Rb5UsaPEws3XbyBc7wMAAjD9yMKa1bSUT1TwuULcji3tDNoZfju8LSCeHGzjDAtoxRoATdLQSXLviuYaE+7pvLBMsr/3uGhARHnaYaWdye+KVwqEPEFdetVIKlROIaNwwNR7huNwsFTMBPph1U85GthNNAgvLIJ6BfXYUpVWDfUL3Be4R4E/m2wpYIdudDek0luuzZ4DIgoKoyab3x//XTBbwLEYOJnSU2meA9yiE8BlrPEo1VQAOi1a/3Vgknq3wrDvjxCEKeaaok0LquFsxnYDCmw1+rP1Z+v8SNTS0GD/INB/w+CZfPuC9wXuDbGci/Vn+Cf4J+rP/YBod4qNnmvSJIdwYVyrPzgAAP76P4//+b7f+6n/up7eP/aX5o/HBdH1lNmSVlVh3xDRx5+O6R+7LaYpTUptfg5hJSYlC16zSeZqAFlraVOqzo+jmBr32iuek2WzwmJthyPz74OpWQ0MGAPVzxHm5+RqHrlHjlTf118sRjR8+kdodQrMc4Kj3ZXClYrgJiZMeDcQ5+SZD58z7jQltF4ku00kyPbzZC4Apds8hZsEiBPIq8r0mw9GiTxD9VftNusERBIxVHB4vWwVMJqV3wvoevrMx1b1s16FJxaa8yK8rexWJQPmkVwiUhio0obx+i8ZQ7yP4FikngYbStTnZ9QCwaNOB4sQkqDr0vAu+AXgVM8zDeBAXF6+P2Q8RlRhTwBkMZ9cWp1JtUFRU15UNezRrofHrSFcnoe7XufByDTwsvca5NR90crPVzTHAPb2Gy377i5QHbfCLo1gnRwOfklKMhq4fUjgOCD3g/fwFmlZsaKRYejZyJwwp0W2tydup4i3RAmN/sK+XDV00udkgaX46LpoIiXFwREEiaYnb2y3QcJMDxe6L8EPr7pxtP3B1jWeJdhRdwUzN49JA7OXKrEgM2nMooX2i5cUMd1838i5HYgKwUwgZwQ2p3i7Xz0cUlTTl/M6c53N0UX5EOccRkB/yNnx0HRXuUSRyF/ptGQ80Q0/jeg+ieLsuU9BAdaMcIhT/XEAgmCGEg5yxR2JHiMDCiUsehNt11bj9rPM1GhsowCIkxNst883eT2Xd30cXG2KPevcVHSTpR8x0RaDbHSUhFVMgD0azvFEelakfzn0cp3HY0XwieD3vu0xtMWn6b+/NfsPvLX0f2nSzR/Mzx9frg9lwROhTHie4TDhHb9NrummGX2Bt3XPuqJlg884b+mCJPAOOcP3zeFUbdMsDm862hHlp0IKzn2nozqsGNAKsXzCFXtieXYsvak7n/2nKDTre0t0c6R4UPa75RB3n7EwrXGTGBre2u+qqFYmnT7nTTEdxo/bG6e4ZF6ygs63WVplE4t+BMF3Dad8N/ZCoAAMCvzSushIAODeZjJdQacLbdZL632G5BQGbdGgC0jSo/4adKZP431RAFgoMnQhwhav0mcoksSa4fivTe4CLfrr/Lj9IafeOH6yPqV4/Ox+rkngeQA5Be0OXnzlPsDtO7wV3Sr+3ZJrk7NIxu7E/vOUIN3CbJZikwiudHIVFMMh+bV7VCC8HporeIqBT9ht9o4LBQBsNUYS+rxE9H5tZrV4gkZY6FsmxvPfWx63nZHvYX/c4tmvr2DiUN0DlzGoWBZoAmlKlRmRx57dpOiPHw+C2cAzyJ0jRuX8YdL7vcH8PUej+6+7P7mOcTCjRwrZWfKVYDxTjydJnqNoYJITFWNvKTgD35i56qr4WcneQL1uyW+pqmA/D+duBTtfthZXs2zBQww/5WKkJNbO66SSXNAXMcwI7xSFf8ayPZU7x4cJkoDnrOgOfxo09CXHJA7AEVb5Mr+nWFE7aPNu0rAsfKsZeJl3y4MDfCPkHn3N3u5VYsKsMm7AgLX2F/+lXrwQtBT9d0CHHVsvRX+FArzvSTngISMoPJ/2FG3yf1bXjmuzL1wH2yMQ5ANjhX9FLtkHwADTxm7TxZij7hlcyFOEDIwkAOJJzUjbgdEb/Z1dS3TxFoIBGHFkyAaAhHYl60AFCBzS73EzH/zIX64YJElyBHxpxd9/RgeFcHLMZKy72CNl17NXYogNTUJtxi+Wan2Rbu1wi8l7T9vyldyAoi/E6ErKS2EQUUO5aANFUi4Noc6FddZMCUMAAvlhEYUNPjr9/5lWQXH1g2O95WlG2E2msmQwsVUaJt3wDh3TLntnkJ+EhPnv58c6wcE6Mb3PbmvZqdJZZeMQW9rr6nYBCXAQ0w4DzGdrTZbbBoRCWE/IquNoaGydbIdIdfN6+1OL9Iucr/wOkf1C3kFEHU6zuDxqkxyyuVD/Wxo+PNzUjGQqT447jcSIssvBvDqwJiN2MU+yoo+KB1RjPg3Y97bWC8b4ZUIi+qMzsK9KDwNzhtwcu+5SMt2OW2IPT5dOGVVblAWHFCeZbmiJ6X0nvboWqW/tFBpOORKfTQrrQLLb13RaW1I9OB66tgH3pdnPy9gyCxZf7pEYQRGXdt9nxksKLDspwxogN2uBX+WrAghDZ83bdDPheNKyBX8SzXpjLuLyl3zIrs2E2dejVg8cw8RStcp4TAI0hCUVgI31fn3q/JsYhfw3CTwiaeW/8Sk2XVH8b4hRQrzbUHCjkPlcahL8JieMdLRs/MXsCEZp72SD+wXWN7VcRaE3vS7MaLBwYMsKJJi8TXBhaarHRNd7APFL9EJXrGxLLb49CXDorEnHuC+nD2conV2NF/jfpLe2Vk9JWkrvVX9Of2SHYmGpxe0aO8hUlv694V6uSy1B3tulwiPTo6nCE7LUXSGFRSV9zNQGsCkhC5+pNvqCajnv9Tk+YMh4qzicTD6AmtMTNHDmlhz2eHKf+Oy93x6290XYInwXE8hDJ3C1YbkKXMjckI7Iq40FK1fQhbu53XEUhQHgnNJYjokBJ5bG0KxxIVkBatI5u1EkSIgyTqAbQDdifTfeK9Ke7gIk1soktPcyPlWZG+HjBaEW/sAnjWtjiJ86D04LjOMqLy4IFVn9kSebis/kaOsmXirN37HQFWja6rc4Ta4X4k57rd8zer/uQIn9bMnmdAuY4g7XLHN/8ELpBqlQFBKyvcdnNQIOmQ/P6y67sXRKqrUCdXcQgACR7m/Xjvbb3drjZjee3LAphwnvbeoMgEvdZ0cnFlMWkGRPfP/4fz7Kx0uMKP/Q9sQ5JfDRlre2HvxMlureEH7u7U7cs2xb/vpq6hsYIOL2Se9NoKAykb+6rFVk1kfHvhvG6h7ZAFkBnuNeHWOuty+CrbD8/ogHlZYShOXhy0t+4dKuMngljJ3cutfpnx0ityQfeXo1irayUzIf9B5rX8S6ydj8XKRcG8LIuPyE7bD/O6+SxzIw7u9V4dpAkIQGMArS8rRGiEwXWl+OgWQrwysn4W7/ossXfKXZWi8srsTjVCHAj25mmWhY4WY9Nv4CD7FRenJOYUmv+OxIzXhPcjQmm8Esk9MySm2ufc6bbcMhFlQ9nSjh8oFA61ABzG9g4yuL0zbuYXPqQIL4FtvpUw14wkFPuvFjZVd6oD9OnPyzAg9Om1J68Cp9tw6d99mEOyyQSIvcrHVAIqn+YsuNCzItK0J5BcFLBB4cOAIAnUL2Zos4VowocIr9wQpKr/CAFlDUEaWO6dDiHtHSj5BHYB5inNb6hMlUgovEFU3b27Jg5wk4kmynu7Uhx2gLhr6lOtMYMMAf2+8AZGQtk29/KQNGQlmoFTA2pazHgnRMC1iNaAmgvgCUzxslvTn8FtKA6QD06wDZ1ydAmsJX2UK+v+wXf6wC+daadeOCm+vy6nJlNNIrYcJSW+Nng7Udyoob7VGNVP2BiGHgTgK4f1ET8dO/ljhAkm78C48KImod4tQn/4KTyERvRMg8wMAAGnJBENoOXmoKG3C6LS/fUcshlSmc1PAYfiS2F6IBQvQ+8xBIAMSLAFh1KUv6QpqBJS1W5/2RVM1GDvup9C+iGwqH/jui5aqbgLut4M9cN23pCURqlSXEvWPA6A0RMscxUYN1r5/YGDlR6FAUeLxL/O4PqABs+u0Luj7YYOQzRThBJwCgeNVZ68A+896DCGToELLDC0NQ9DMJBvIsFWDXSj1cN/bOedDh5T1kYqn3u34rwsjfGwUE658t+H2XRmeoneRkf9v7+XMb+7JlYThiyVnXDQzIgwATXKH1MSqddCaB2q1VViTaA8vnXcX/ksCwahwh478oNc3bsxY+eX0SQRpvaWBZVtlkhBu0n2F7+ccykffmc0JrOQ9U1WnyL1oY+WaEGWJK+PVVkOBMzpM7qMLZ78ZbU/JbtCCBGftTz/dt+3cNUNJd9Mt8gf5ShbhpAhaqLtqZqquMSVmXgChEWPP2lUgBCm41yMf9Zhe6U35HXGkeAdV67hyV94npEoHhTXMMEhTlll+ok/X3Hz2xbb4N507Qmob40Z960lDbWBAJzGfp/mg4imSQF0PpSOyP41u4cd/gUDqHZhSLtLWDJPU49Wn1nbwHjj0kkC2YAh3m2O+xV/20rauKvXQd2/n5nsbBvXkA3hQD093Y7ZmWyhBZ8FFONmFmnj48KmNhy/5SM15kw9/Ikt/ccCGngzBHE/9hkc4B4xAXvdi/JoaTggteoLmwIoKUpuIacUVnfTbgg1Kq+HQEH/ymdsy4rNW56msSUm0VWHQ1eAyQK2Kyzz95TA5e6HPbt2HORAGiQB9jGK+kAD6WCM3NrOxh0D2hoqKgGXdQpeSdxQcYO3Wuk28nQffLwJXzSPJSE0aAlVvXml1ryc7N3o7wXyyfrAnn1Za6Ae1wA0f+hh+OZ8gJAzs1uOUaQVBu8DTF9vGwnCSSMYhpMb6W9wyLk6zoATQ9KWHP+AxMvM2eqKDkW43z7g/p9U33g/CMn7LinF1IqCzT9gTXBQIOVcdLk8jf5Wjrystl3Sl5sqKsMCU1a2b0m08zGqxGvdjiI8ayaa8uAztsIdw/UYY2A5WBSyXy1h1ddyXUZ1xKHVjGRyEhysa5vWTv+gZVMyb2v1wD+u8BXHC2lRlxL2GNMsh69c5wAlbisZvymb5KDkoFf+NXMZMecJV9qFIh8N1fJwDxm5FpWeVT0fWF3pgAEubq8eu8VoW3i0upGyMcsZgQP2V2bhRU36/lrccMUnhxhMeZR8wi73lH0ZF5mmSmo8/u8QZtOaH08bvWe4UubzJZZG4X/qereT0e8QtuQUH/bJyGUrgCNM+nvxvrZhrKEI7DUFesLM7hAtR07bC1FOCgWe1kofbAySx0ZX8IsgrtDNcs18YXUzmeLuF7iqNG9lPT2GRZ+GJwtGi3F2KFugJBPmDcHHMg/gy5tf7kiA8OMR1g4vkFHW+E5LHKjAu0amRB6m5bOfZNC2XjhrvmHalrWEXtpSnSW8qYfL3fDAG+jSykEC+Z8gwfmhDPOJDOC4jsgGYbBjyPgHjHWZxQfEFKbchPqrt+j1XOjrN9gS9TmRV5yYoKy0fwUmyC2Qxmgb6tybZg0/vmDJhS5XNwcpHCtKFSNsy8I47ys/xm1XdV3nTwWs7TjaBLxNlMT65P4AZagumpZFRRVrq2bqZkWXgdvBRCtK1uWAKcQBZAAAAAAUXy/MlV9ASUgKp90CK0Znva0/CwiktWBSIE3MXYm57IAA==";
+    const BAGS_IMG = "data:image/webp;base64,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";
 
-    // Fallback image URL when an external product image cannot be loaded
-    const FALLBACK_PRODUCT_IMG = "https://placehold.co/120x120/DAF8FA/304EB0?text=Nearbuy";
+    const FALLBACK_PRODUCT_IMG = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">' +
+      '<rect width="120" height="120" fill="#DAF8FA"/>' +
+      '<path d="M40 48h40l-4 40H44l-4-40z" fill="#304EB0" opacity="0.22"/>' +
+      '<path d="M48 48v-6a12 12 0 0124 0v6" fill="none" stroke="#304EB0" stroke-width="4" stroke-linecap="round"/>' +
+      '<circle cx="60" cy="68" r="5" fill="#304EB0"/>' +
+      '</svg>'
+    );
 
     // =========================================================================
-    // 2. REAL MADRID CATALOG (12 INDEPENDENT LOCAL PRODUCTS)
+    // 3. REAL MADRID PRODUCT CATALOG (12 SCRAPED LOCAL PRODUCTS)
     // =========================================================================
-    const REAL_CATALOG = [
+    const LOCAL_CATALOG = [
       {
+        id: 1,
         store_name: "Atelier Aletheia",
         district: "Argüelles",
-        address: "P.º de la Florida, 33, Argüelles, Madrid",
-        hours_en: "Open · 10:30–20:00",
-        hours_es: "Abierto · 10:30–20:00",
         product_name: "Vestido Carminia",
         price: 550.00,
-        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1792719210_6adab96ab8416_ATELIERALETHEIA-7B.jpg?filter=q60_fill_webp",
-        keywords: ["dress", "dresses", "vestido", "vestidos", "fashion", "moda", "ropa", "event", "evento", "party", "fiesta"]
+        address: "Calle de Ferraz, Argüelles, Madrid",
+        hours_en: "Open today · 10:30–20:00",
+        hours_es: "Abierto hoy · 10:30–20:00",
+        category: "dress",
+        keywords: ["dress", "vestido", "carminia", "fashion", "ropa", "evento", "event", "arguelles", "argüelles", "atelier"],
+        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1792719210_6adab96ab8416_ATELIERALETHEIA-7B.jpg?filter=q60_fill_webp"
       },
       {
+        id: 2,
         store_name: "Azalea",
         district: "Argüelles",
-        address: "Calle de Modesto Lafuente, 1, Argüelles, Madrid",
-        hours_en: "Open · 10:30–20:30",
-        hours_es: "Abierto · 10:30–20:30",
         product_name: "Vestido Largo Cuadros Antracita",
         price: 30.95,
-        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1794406237_6af4775d94b0c_125.jpg?filter=q60_fill_webp",
-        keywords: ["dress", "dresses", "vestido", "vestidos", "fashion", "moda", "ropa"]
+        address: "Calle de Princesa, Argüelles, Madrid",
+        hours_en: "Open today · 10:00–20:30",
+        hours_es: "Abierto hoy · 10:00–20:30",
+        category: "dress",
+        keywords: ["dress", "vestido", "largo", "cuadros", "fashion", "ropa", "arguelles", "argüelles", "azalea"],
+        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1794406237_6af4775d94b0c_125.jpg?filter=q60_fill_webp"
       },
       {
+        id: 3,
         store_name: "An&Be",
         district: "Salamanca",
-        address: "C. de Hermosilla, 20, Salamanca, Madrid",
-        hours_en: "Open · 10:00–20:30",
-        hours_es: "Abierto · 10:00–20:30",
         product_name: "Vestido África estampado",
         price: 99.00,
-        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1790599495_6aba61476e258_DSC8818.jpg?filter=q60_fill_webp",
-        keywords: ["dress", "dresses", "vestido", "vestidos", "fashion", "moda", "ropa", "salamanca"]
+        address: "Calle de Ayala, Salamanca, Madrid",
+        hours_en: "Open today · 10:30–20:30",
+        hours_es: "Abierto hoy · 10:30–20:30",
+        category: "dress",
+        keywords: ["dress", "vestido", "africa", "estampado", "fashion", "ropa", "salamanca", "an&be"],
+        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1790599495_6aba61476e258_DSC8818.jpg?filter=q60_fill_webp"
       },
       {
+        id: 4,
         store_name: "Boutique Franci love",
         district: "Argüelles",
-        address: "Calle de Bravo Murillo, Argüelles, Madrid",
-        hours_en: "Open · 10:00–20:30",
-        hours_es: "Abierto · 10:00–20:30",
         product_name: "Bailarinas de Piel",
         price: 36.00,
-        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1765417272_693a213823f9c_IMG-2463-scaled.webp?filter=q60_fill_webp",
-        keywords: ["shoe", "shoes", "flats", "footwear", "zapato", "zapatos", "calzado", "bailarina", "bailarinas"]
+        address: "Calle de Alberto Aguilera, Argüelles, Madrid",
+        hours_en: "Open today · 10:30–20:30",
+        hours_es: "Abierto hoy · 10:30–20:30",
+        category: "shoes",
+        keywords: ["shoes", "zapatos", "calzado", "bailarinas", "flats", "piel", "leather", "arguelles", "argüelles", "franci"],
+        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1765417272_693a213823f9c_IMG-2463-scaled.webp?filter=q60_fill_webp"
       },
       {
+        id: 5,
+        store_name: "Cremades",
+        district: "Argüelles",
+        product_name: "Bailarina Beige y Negro",
+        price: 49.00,
+        address: "Calle de Princesa, Argüelles, Madrid",
+        hours_en: "Open today · 10:00–20:30",
+        hours_es: "Abierto hoy · 10:00–20:30",
+        category: "shoes",
+        keywords: ["shoes", "zapatos", "calzado", "bailarina", "flats", "beige", "negro", "arguelles", "argüelles", "cremades"],
+        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1790799797_6abd6fb58ec57_76054-BAILARINABEIGEYNEGRO.jpg?filter=q60_fill_webp"
+      },
+      {
+        id: 6,
         store_name: "Mimao",
         district: "Salamanca",
-        address: "ABC Serrano, C. de Serrano, 61, Salamanca, Madrid",
-        hours_en: "Open · 10:00–21:00",
-        hours_es: "Abierto · 10:00–21:00",
-        product_name: "Adriana Sandalias Planas de Piel",
+        product_name: "Sandalias planas de piel Adriana",
         price: 44.25,
-        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1783698742_6a511536c4798_26176MARRONGRIS.jpg?filter=q60_fill_webp",
-        keywords: ["shoe", "shoes", "sandal", "sandals", "footwear", "zapato", "zapatos", "calzado", "sandalia", "sandalias", "salamanca"]
+        address: "Calle de Goya, Salamanca, Madrid",
+        hours_en: "Open today · 10:00–21:00",
+        hours_es: "Abierto hoy · 10:00–21:00",
+        category: "shoes",
+        keywords: ["shoes", "zapatos", "calzado", "sandals", "sandalias", "adriana", "piel", "leather", "salamanca", "mimao"],
+        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1783698742_6a511536c4798_26176MARRONGRIS.jpg?filter=q60_fill_webp"
       },
       {
+        id: 7,
         store_name: "Juguetería Rey Mago",
         district: "Tetuán",
-        address: "C. de Bravo Murillo, 124, Tetuán, Madrid",
-        hours_en: "Open · 10:00–20:30",
-        hours_es: "Abierto · 10:00–20:30",
-        product_name: "100 Juegos Reunidos Falomir",
+        product_name: "100 Juegos Reunidos Falomir +6",
         price: 14.99,
-        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1793219895_6ae25d37aa884_01308-falomir-juego-100-juegos-reunidos-izda-imagen-portada.jpg?filter=q60_fill_webp",
-        keywords: ["toy", "toys", "game", "games", "board", "kids", "gift", "juguete", "juguetes", "juego", "juegos", "regalo", "tetuan"]
+        address: "Calle de Bravo Murillo, Tetuán, Madrid",
+        hours_en: "Open today · 10:00–20:30",
+        hours_es: "Abierto hoy · 10:00–20:30",
+        category: "toys",
+        keywords: ["toy", "toys", "juguete", "juguetes", "board", "game", "juego", "juegos", "mesa", "falomir", "kids", "niños", "tetuan", "tetuán", "regalo", "gift"],
+        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1793219895_6ae25d37aa884_01308-falomir-juego-100-juegos-reunidos-izda-imagen-portada.jpg?filter=q60_fill_webp"
       },
       {
-        store_name: "El Jardín de la Abuela",
-        district: "Argüelles",
-        address: "C. de Martín de los Heros, 89, Argüelles, Madrid",
-        hours_en: "Open · 10:00–20:00",
-        hours_es: "Abierto · 10:00–20:00",
-        product_name: "Peluche Artesanal",
-        price: 10.00,
-        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1784902638_6a6373ee06d76_PELUCHE-1.png?filter=q60_fill_webp",
-        keywords: ["toy", "toys", "plush", "stuffed", "kids", "baby", "gift", "juguete", "juguetes", "peluche", "bebe", "regalo"]
-      },
-      {
-        store_name: "AR Boutique Floral",
-        district: "Argüelles",
-        address: "C. de Rafael Calvo, 19, Argüelles, Madrid",
-        hours_en: "Open · 10:00–20:00",
-        hours_es: "Abierto · 10:00–20:00",
-        product_name: "Bouquet Calma",
-        price: 75.00,
-        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1757924244_68c7cb94c2398_Bouquetcalma-1.png?filter=q60_fill_webp",
-        keywords: ["flower", "flowers", "bouquet", "floral", "gift", "flor", "flores", "ramo", "regalo"]
-      },
-      {
-        store_name: "Provocateur Roses",
-        district: "Salamanca",
-        address: "Calle de Goya, 17, Salamanca, Madrid",
-        hours_en: "Open · 09:30–20:30",
-        hours_es: "Abierto · 09:30–20:30",
-        product_name: "10 Hortensias Blancas Luxury",
-        price: 120.00,
-        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1790920389_6abf46c53b490_Diseno-sin-titulo-27.jpg?filter=q60_fill_webp",
-        keywords: ["flower", "flowers", "bouquet", "roses", "hydrangea", "flor", "flores", "ramo", "rosas", "hortensias", "goya", "salamanca"]
-      },
-      {
-        store_name: "Azul de Mar",
-        district: "Argüelles",
-        address: "C. de Altamirano, 1, Argüelles, Madrid",
-        hours_en: "Open · 10:30–20:30",
-        hours_es: "Abierto · 10:30–20:30",
-        product_name: "Anillo Dolma",
-        price: 9.95,
-        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1786112962_6a75ebc2b4779_anillo-dolma.jpg?filter=q60_fill_webp",
-        keywords: ["ring", "rings", "jewelry", "jewellery", "accessory", "anillo", "anillos", "joya", "joyas", "bisuteria"]
-      },
-      {
-        store_name: "Letrimagia",
-        district: "Argüelles",
-        address: "C. de Gaztambide, 19, Argüelles, Madrid",
-        hours_en: "Open · 10:30–20:30",
-        hours_es: "Abierto · 10:30–20:30",
-        product_name: "Libro Atrapa Monstruos",
-        price: 7.00,
-        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1759135473_68da46f184e42_50D632CF-350D-4376-A97D-EF2A0EA2D952-e1625486722122.jpeg?filter=q60_fill_webp",
-        keywords: ["book", "books", "story", "reading", "kids", "libro", "libros", "cuento", "lectura", "infantil"]
-      },
-      {
+        id: 8,
         store_name: "Zacatrus",
         district: "Argüelles",
-        address: "C. de Fernández de los Ríos, 57, Argüelles, Madrid",
-        hours_en: "Open · 10:30–20:30",
-        hours_es: "Abierto · 10:30–20:30",
-        product_name: "Juego de mesa Aetherya",
+        product_name: "Aetherya",
         price: 22.45,
-        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1793651615_6ae8f39fcc9c1_aetherya-portada.jpg?filter=q60_fill_webp",
-        keywords: ["board", "game", "games", "toy", "toys", "tabletop", "juego", "juegos", "mesa", "juguete", "juguetes"]
+        address: "Calle de Fernández de los Ríos, Argüelles, Madrid",
+        hours_en: "Open today · 10:30–20:30",
+        hours_es: "Abierto hoy · 10:30–20:30",
+        category: "toys",
+        keywords: ["board", "game", "juego", "juegos", "mesa", "toy", "juguete", "aetherya", "zacatrus", "arguelles", "argüelles", "regalo", "gift"],
+        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1793651615_6ae8f39fcc9c1_aetherya-portada.jpg?filter=q60_fill_webp"
+      },
+      {
+        id: 9,
+        store_name: "Petit Abú",
+        district: "Salamanca",
+        product_name: "Álbum de fotos Stella Lilliputiens",
+        price: 24.99,
+        address: "Calle de Ayala, Salamanca, Madrid",
+        hours_en: "Open today · 10:30–20:30",
+        hours_es: "Abierto hoy · 10:30–20:30",
+        category: "toys",
+        keywords: ["toy", "toys", "juguete", "juguetes", "album", "fotos", "stella", "lilliputiens", "baby", "bebe", "kids", "niños", "regalo", "gift", "salamanca", "petit"],
+        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1787221400_6a86d59836984_funciones-df6e0462-c3e5-4ae6-b567-3d5d2d3e047b.jpg?filter=q60_fill_webp"
+      },
+      {
+        id: 10,
+        store_name: "AR Boutique Floral",
+        district: "Argüelles",
+        product_name: "Bouquet Calma",
+        price: 75.00,
+        address: "Calle de Marqués de Urquijo, Argüelles, Madrid",
+        hours_en: "Open today · 10:00–20:30",
+        hours_es: "Abierto hoy · 10:00–20:30",
+        category: "flowers",
+        keywords: ["flower", "flowers", "flor", "flores", "bouquet", "ramo", "calma", "regalo", "gift", "arguelles", "argüelles"],
+        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1757924244_68c7cb94c2398_Bouquetcalma-1.png?filter=q60_fill_webp"
+      },
+      {
+        id: 11,
+        store_name: "Provocateur Roses",
+        district: "Salamanca",
+        product_name: "10 Hortensias Blancas Luxury",
+        price: 120.00,
+        address: "Calle de Velázquez, Salamanca, Madrid",
+        hours_en: "Open today · 09:30–20:30",
+        hours_es: "Abierto hoy · 09:30–20:30",
+        category: "flowers",
+        keywords: ["flower", "flowers", "flor", "flores", "bouquet", "ramo", "roses", "rosas", "hortensias", "hydrangeas", "salamanca", "regalo", "gift"],
+        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1790920389_6abf46c53b490_Diseno-sin-titulo-27.jpg?filter=q60_fill_webp"
+      },
+      {
+        id: 12,
+        store_name: "Azul de Mar",
+        district: "Argüelles",
+        product_name: "Anillo Dolma",
+        price: 9.95,
+        address: "Calle de Princesa, Argüelles, Madrid",
+        hours_en: "Open today · 10:30–20:30",
+        hours_es: "Abierto hoy · 10:30–20:30",
+        category: "jewelry",
+        keywords: ["ring", "anillo", "jewelry", "joya", "joyas", "joyeria", "dolma", "regalo", "gift", "arguelles", "argüelles"],
+        image_url: "https://cms.trackntake.com/image/productfinder/images/product/1786112962_6a75ebc2b4779_anillo-dolma.jpg?filter=q60_fill_webp"
       }
     ];
 
     // =========================================================================
-    // 3. COMPLETE BILINGUAL DICTIONARY (EN DEFAULT / ES FULL TRANSLATION)
+    // 4. BILINGUAL TRANSLATIONS (ENGLISH DEFAULT + SPANISH)
     // =========================================================================
     const TRANSLATIONS = {
       en: {
-        nav_ncommerce: "N-commerce",
+        nav_mission: "N-commerce",
         nav_how: "How it works",
-        nav_merchants: "For Merchants",
-        nav_cta: "Merchant Portal",
+        nav_shops: "For shops",
+        nav_cta: "Try the AI",
         hero_badge: "Madrid: Argüelles, Salamanca & Tetuán",
         hero_title_1: "The speed of e-commerce.",
         hero_title_2: "The soul of your neighborhood.",
-        hero_subtitle: "Nearbuy's AI locates real in-stock products at independent Madrid shops just minutes away on foot, with live opening hours.",
-        hero_cta_primary: "Try the AI Assistant",
-        hero_cta_secondary: "Register your store",
-        stat_districts: "Madrid districts",
-        stat_stock: "Live local stock",
-        stat_shipping: "Shipping or waiting",
+        hero_subtitle: "Nearbuy's AI checks real-time stock at independent Madrid shops so you find exactly what you need minutes from home—ready to pick up today.",
+        hero_cta_primary: "Try the AI assistant",
+        hero_cta_secondary: "Do you own a local shop? →",
+        back_to_nearbuy: "← Back to Nearbuy",
         phone_title: "Nearbuy AI",
-        phone_online: "Online · Madrid",
-        phone_live_api: "Connected to Nearbuy API",
+        phone_online: "Online",
+        phone_live_api: "Live API connected",
         chat_placeholder: "Ask for a product & area...",
-        chat_welcome: "Hi! I'm Nearbuy AI. Tell me what you're looking for (dresses, shoes, toys, board games, flowers, jewelry, or books) and your area in Madrid.",
-        mission_eyebrow: "THE N-COMMERCE MOVEMENT",
-        mission_headline: "N-commerce: buy today, without erasing your city.",
-        mission_p1: "When mega-chains and e-commerce take over every street, cities lose their identity and lifelong family shops disappear.",
-        mission_p2: "Nearbuy Commerce puts neighborhoods first: the digital speed you expect today, connected directly to the independent specialty shops that keep Madrid alive.",
-        pillar1_title: "Living identity",
-        pillar1_desc: "Unique streets filled with specialty shops, not identical corporate clones.",
-        pillar2_title: "Real stock, zero waiting",
-        pillar2_desc: "In your hands within a 10-minute walk—no cardboard boxes or 48h shipping.",
-        pillar3_title: "Neighborhood economy",
-        pillar3_desc: "Every purchase directly supports local families and independent shopkeepers.",
-        cmp_ecom_label: "Traditional E-commerce",
-        cmp_ecom_1: "24–48h delivery vans, packaging waste, and shipping fees.",
-        cmp_ecom_2: "Value leaves the neighborhood toward distant mega-warehouses.",
-        cmp_ecom_3: "Homogenized streets as independent shops close their doors.",
-        cmp_ncom_label: "N-commerce · Nearbuy",
-        cmp_ncom_1: "In your hands in minutes on foot—zero shipping, zero boxes.",
-        cmp_ncom_2: "100% of your spend strengthens local families and neighborhood life.",
-        cmp_ncom_3: "AI-powered discovery for specialty stores with live POS stock.",
-        how_eyebrow: "HOW IT WORKS",
-        how_headline: "From your phone to your local shop in three steps.",
-        step1_title: "Ask naturally",
-        step1_desc: "Tell Nearbuy AI what you need and your street or neighborhood in Madrid.",
-        step2_title: "Real local stock",
-        step2_desc: "We match nearby independent shops with live POS availability, product photos, and opening hours.",
-        step3_title: "Walk in & pick up",
-        step3_desc: "Follow the direct Google Maps walking route and take it home today with zero shipping.",
-        b2b_eyebrow: "FOR LOCAL MERCHANTS",
-        b2b_headline: "Your physical shop, visible on every neighbor's phone.",
-        b2b_subtitle: "Connect your real inventory without changing how you work and attract nearby shoppers already looking for what you sell today.",
-        tpv_step1: "Your existing POS",
-        tpv_step2: "Automated inventory export",
-        tpv_step3: "Live on Nearbuy AI",
-        tpv_step4: "Customers at your door",
-        b2b_c1_title: "Automated POS Sync",
-        b2b_c1_desc: "Automated export of your digital inventory straight from your POS (TPV)—no manual product uploads.",
-        b2b_c2_title: "5-Minute Onboarding",
-        b2b_c2_desc: "Connect your catalog and opening hours without changing your workflow or paying abusive fees.",
-        b2b_c3_title: "Direct Foot Traffic",
-        b2b_c3_desc: "Neighbors searching for exactly what you have in stock are guided straight to your doorstep.",
-        b2b_box_title: "Do you run an independent shop in Madrid?",
-        b2b_note: "Pilot program open in Argüelles, Salamanca & Tetuán.",
-        b2b_cta: "Open Merchant Portal →",
-        footer_terms: "Terms & Conditions",
-        footer_privacy: "Privacy Policy",
-        footer_made: "Independent local commerce powered by AI.",
-        modal_close: "Got it",
+        chat_welcome: "Hi! I'm Nearbuy AI. Tell me what you're looking for in Argüelles, Salamanca, or Tetuán and I'll find real in-stock items nearby.",
+        stock_badge: "In stock",
+        maps_cta: "Open in Google Maps →",
         chips: [
           "Dress in Salamanca",
           "Board game or toy",
           "Bouquet of flowers",
           "Umbrella near María de Molina"
         ],
-        maps_cta: "Open in Maps →",
-        chat_greeting_reply: "Hello! How can I help you shop locally in Madrid today? Try asking for a dress in Salamanca, a bouquet of flowers, leather shoes, a book, or a board game.",
-        chat_no_umbrella: "I checked our live local POS inventory across Argüelles, Salamanca, and Tetuán, and none of our partner shops currently have umbrellas in stock. Would you like to browse dresses, shoes, flowers, jewelry, books, or board games instead?",
-        chat_no_match: "I couldn't find an exact match in our current Madrid pilot inventory for that item. Right now we have live stock for dresses, leather shoes, toys, board games, bouquets, rings, and children's books—try one of those!",
-        chat_found_prefix: "Here is what I found in stock at independent shops near you:",
-        legal_terms_title: "Terms & Conditions — Nearbuy",
+        mission_eyebrow: "N-COMMERCE · NEARBY COMMERCE",
+        mission_title: "Cities shouldn't all look the same.",
+        mission_desc: "Global chains and next-day delivery giants are turning vibrant streets into identical corridors. Nearbuy champions independent, family-run shops—bringing their real shelves online so your neighborhood stays alive.",
+        pillar_1_title: "Real-time local stock",
+        pillar_1_desc: "Know what is genuinely sitting on a nearby shelf right now—with transparent prices, real photos, and live opening hours before you step outside.",
+        pillar_2_title: "Alive neighborhoods",
+        pillar_2_desc: "Specialty boutiques, independent toy shops, and artisan florists give Madrid its character. Every local purchase keeps your streets distinct and thriving.",
+        pillar_3_title: "Support local families",
+        pillar_3_desc: "Keep spending circulating in your community instead of distant fulfillment warehouses—getting instant human advice and zero packaging waste.",
+        comp_old_label: "Traditional E-commerce",
+        comp_old_1: "24–48h waits & excess cardboard",
+        comp_old_2: "Drains local street foot traffic",
+        comp_old_3: "No local specialist advice",
+        comp_new_label: "N-commerce · Nearbuy",
+        comp_new_1: "In-stock items minutes on foot",
+        comp_new_2: "Directly fuels Madrid families",
+        comp_new_3: "Zero boxes, pickup today",
+        how_eyebrow: "HOW IT WORKS",
+        how_title: "From search to storefront in 3 steps.",
+        step_1_title: "Ask naturally",
+        step_1_desc: "Tell Nearbuy what you need and which neighborhood you're in—just like texting a local friend.",
+        step_2_title: "Verified stock nearby",
+        step_2_desc: "Our AI matches your query against live inventories from independent stores in Argüelles, Salamanca & Tetuán.",
+        step_3_title: "Walk in & pick it up today",
+        step_3_desc: "Check exact prices, product photos, opening hours, and tap Google Maps to walk straight to the shop.",
+        shops_eyebrow: "FOR LOCAL SHOPS",
+        shops_title: "Turn your existing POS into online visibility.",
+        shops_desc: "No manual catalog uploads or extra software to learn. Nearbuy connects directly to the digital inventory already running on your POS / TPV system.",
+        tpv_1: "Your current POS (TPV)",
+        tpv_2: "Automated stock export",
+        tpv_3: "Visible on Nearbuy AI",
+        tpv_4: "Walk-in customers today",
+        shop_feat_1_title: "Automated POS sync",
+        shop_feat_1_desc: "Syncs your digital inventory directly from your existing TPV/POS without manual uploads or spreadsheets.",
+        shop_feat_2_title: "Live in 5 minutes",
+        shop_feat_2_desc: "Connect your store profile, opening hours, and inventory feed in minutes—zero technical skills needed.",
+        shop_feat_3_title: "Direct foot traffic",
+        shop_feat_3_desc: "Brings high-intent neighborhood buyers straight to your door—zero shipping headaches or logistics.",
+        shops_bar_title: "Ready to put your neighborhood store on Nearbuy?",
+        shops_bar_sub: "Currently onboarding independent shops across Argüelles, Salamanca & Tetuán.",
+        shops_cta: "Join as a local shop →",
+        footer_tagline: "Find everything, nearby.",
+        footer_copy: "© 2026 Nearbuy · N-commerce Madrid. All rights reserved.",
+        footer_terms: "Terms & Conditions",
+        footer_privacy: "Privacy Policy",
+        chat_greeting_reply: "Hey there! Ask me for dresses, shoes, toys, board games, bouquets, or jewelry in Argüelles, Salamanca, or Tetuán.",
+        chat_not_found_umbrella: "I checked our connected shops near María de Molina and across Salamanca, Argüelles, and Tetuán, and none currently list umbrellas in stock. Would you like to explore dresses, shoes, flowers, or board games nearby?",
+        chat_not_found_generic: "I couldn't find an exact match for that item in our current Madrid pilot catalog (Argüelles, Salamanca & Tetuán). Try searching for a dress, shoes, board game, flowers, or ring!",
+        chat_found_prefix: "Here is what I found in stock at nearby independent Madrid shops:",
+        legal_terms_title: "Terms & Conditions",
         legal_terms_html: `
-          <p><strong>1. Platform Purpose:</strong> Nearbuy is an <em>N-commerce</em> (Nearbuy Commerce) digital platform built to help shoppers discover real in-stock products at independent local stores across Madrid (pilot active in Argüelles, Salamanca, and Tetuán).</p>
-          <p><strong>2. Stock &amp; Pricing Accuracy:</strong> Inventory counts, photos, prices, and opening hours are synced from participating local merchants' POS systems and catalogs. Nearbuy operates as a discovery platform and does not process direct payments or shipping.</p>
-          <p><strong>3. AI Assistant Usage:</strong> Recommendations provided by the Nearbuy AI assistant are informational and designed to locate nearby shops and estimate walking directions via Google Maps.</p>
-          <p><strong>4. Intellectual Property:</strong> The Nearbuy brand, mascot, visual identity, and software are protected under applicable law. Official contact: @nearbuyspain.</p>
+          <p><strong>1. About Nearbuy (N-commerce)</strong><br />Nearbuy is a local-product discovery platform connecting Madrid shoppers with real-time stock at independent neighborhood stores in Argüelles, Salamanca, and Tetuán.</p>
+          <p><strong>2. Inventory &amp; Pricing Accuracy</strong><br />Product availability, photos, and prices are synchronized directly from participating merchants' POS/TPV catalogs. Because items are sold in-store, final availability is confirmed at the shop.</p>
+          <p><strong>3. No Intermediary Sale</strong><br />Nearbuy acts as a discovery assistant and directs you to the physical store. Purchases, warranties, and returns are handled directly with the local merchant.</p>
         `,
-        legal_privacy_title: "Privacy Policy — Nearbuy",
+        legal_privacy_title: "Privacy Policy",
         legal_privacy_html: `
-          <p><strong>1. Data Controller:</strong> Nearbuy Team (Madrid, Spain). We protect your privacy in compliance with the EU General Data Protection Regulation (GDPR).</p>
-          <p><strong>2. Data Processed:</strong> We only process the search messages and approximate location (street, metro station, or neighborhood in Madrid) that you voluntarily enter in the chat to calculate walking distances to nearby shops.</p>
-          <p><strong>3. Retention &amp; Sharing:</strong> We never sell personal data to third parties or track your background GPS location. Chat sessions are used strictly to generate your requested local shopping results.</p>
-          <p><strong>4. Your Rights:</strong> You may request access, correction, or deletion of any personal data at any time through our official channels (@nearbuyspain).</p>
-        `,
-        merchant_modal_title: "Merchant Portal — Nearbuy",
-        merchant_modal_html: `
-          <p>You are viewing the <strong>Nearbuy</strong> MVP demonstration homepage. This button is ready to link directly to your live merchant onboarding web app.</p>
-          <p>To connect your real portal, simply update the <code class="px-1.5 py-0.5 rounded bg-slate-100 text-nearbuy-cobalt font-mono text-xs">MERCHANT_PORTAL_URL</code> constant at the top of the script.</p>
+          <p><strong>1. Data Minimization</strong><br />Nearbuy does not require account registration to search local products. Queries entered in the AI assistant are processed solely to return relevant nearby store recommendations.</p>
+          <p><strong>2. Location &amp; Maps</strong><br />We only use the neighborhood you mention in your prompt. Clicking a Google Maps link opens Google's service under their own privacy policy.</p>
+          <p><strong>3. Contact &amp; Rights (GDPR)</strong><br />Under EU GDPR regulations, you may request information or deletion of any merchant contact data shared with Nearbuy by reaching out via @nearbuyspain.</p>
         `
       },
       es: {
-        nav_ncommerce: "N-commerce",
+        nav_mission: "N-commerce",
         nav_how: "Cómo funciona",
-        nav_merchants: "Para comercios",
-        nav_cta: "Panel de comercios",
+        nav_shops: "Para comercios",
+        nav_cta: "Probar IA",
         hero_badge: "Madrid: Argüelles, Salamanca y Tetuán",
         hero_title_1: "La inmediatez del e-commerce.",
         hero_title_2: "El alma de tu barrio.",
-        hero_subtitle: "La IA de Nearbuy localiza productos reales en stock en comercios independientes de Madrid a pocos minutos a pie, con horario en vivo.",
-        hero_cta_primary: "Probar asistente IA",
-        hero_cta_secondary: "Registra tu tienda",
-        stat_districts: "Barrios de Madrid",
-        stat_stock: "Stock local real",
-        stat_shipping: "Envíos ni esperas",
+        hero_subtitle: "La IA de Nearbuy consulta el stock real de tiendas independientes en Madrid para que encuentres lo que buscas a minutos de casa y lo recojas hoy.",
+        hero_cta_primary: "Probar el asistente IA",
+        hero_cta_secondary: "¿Tienes un comercio local? →",
+        back_to_nearbuy: "← Volver a Nearbuy",
         phone_title: "Nearbuy IA",
-        phone_online: "En línea · Madrid",
-        phone_live_api: "Conectado a Nearbuy API",
-        chat_placeholder: "Pregunta por un producto y zona...",
-        chat_welcome: "¡Hola! Soy Nearbuy IA. Dime qué buscas (vestidos, calzado, juguetes, juegos de mesa, flores, joyas o libros) y en qué zona de Madrid estás.",
-        mission_eyebrow: "EL MOVIMIENTO N-COMMERCE",
-        mission_headline: "N-commerce: comprar hoy, sin borrar tu ciudad.",
-        mission_p1: "Cuando las grandes cadenas y el e-commerce copan cada calle, las ciudades pierden su identidad y las tiendas familiares de toda la vida desaparecen.",
-        mission_p2: "Nearbuy Commerce devuelve el foco al barrio: la rapidez digital que esperas hoy, conectada directamente al comercio independiente de especialidad que mantiene vivo a Madrid.",
-        pillar1_title: "Identidad viva",
-        pillar1_desc: "Calles únicas con tiendas de especialidad, no clones corporativos idénticos.",
-        pillar2_title: "Stock real, cero esperas",
-        pillar2_desc: "En tu mano en 10 minutos a pie, sin cajas de cartón ni envíos de 48h.",
-        pillar3_title: "Economía de barrio",
-        pillar3_desc: "Cada compra sostiene directamente a familias y comercios independientes.",
-        cmp_ecom_label: "E-commerce tradicional",
-        cmp_ecom_1: "Furgonetas de 24–48h, residuos de embalaje y gastos de envío.",
-        cmp_ecom_2: "El valor se escapa del barrio hacia grandes almacenes lejanos.",
-        cmp_ecom_3: "Calles homogéneas a medida que cierran las tiendas independientes.",
-        cmp_ncom_label: "N-commerce · Nearbuy",
-        cmp_ncom_1: "En tu mano en minutos a pie: cero envíos y cero cajas.",
-        cmp_ncom_2: "El 100% de tu compra fortalece a familias y comercios de tu zona.",
-        cmp_ncom_3: "Descubrimiento con IA en tiendas de especialidad con stock TPV real.",
-        how_eyebrow: "CÓMO FUNCIONA",
-        how_headline: "Del móvil a tu tienda de barrio en tres pasos.",
-        step1_title: "Pregunta con naturalidad",
-        step1_desc: "Dile a Nearbuy IA qué artículo necesitas y tu calle o barrio en Madrid.",
-        step2_title: "Stock local real",
-        step2_desc: "Filtramos comercios independientes cercanos con disponibilidad TPV, foto real y horario en vivo.",
-        step3_title: "Acércate a pie y llévatelo",
-        step3_desc: "Sigue la ruta caminando en Google Maps y recógelo hoy mismo sin gastos de envío.",
-        b2b_eyebrow: "PARA COMERCIOS LOCALES",
-        b2b_headline: "Tu tienda física, visible en el móvil de todo el barrio.",
-        b2b_subtitle: "Conecta tu inventario real sin cambiar tu forma de trabajar y atrae a vecinos que ya están buscando lo que vendes hoy.",
-        tpv_step1: "Tu TPV actual",
-        tpv_step2: "Exportación automática",
-        tpv_step3: "Visible en Nearbuy IA",
-        tpv_step4: "Clientes en tu puerta",
-        b2b_c1_title: "Sincronización TPV automática",
-        b2b_c1_desc: "Exportación automatizada de tu inventario digital directamente desde tu TPV, sin subir productos a mano.",
-        b2b_c2_title: "Alta en 5 minutos",
-        b2b_c2_desc: "Conecta tu catálogo y horarios de apertura sin cambiar tu forma de trabajar ni pagar comisiones abusivas.",
-        b2b_c3_title: "Visitas directas a tu local",
-        b2b_c3_desc: "Vecinos que buscan exactamente lo que tienes en stock llegan guiados hasta tu puerta.",
-        b2b_box_title: "¿Tienes una tienda independiente en Madrid?",
-        b2b_note: "Fase piloto abierta en Argüelles, Salamanca y Tetuán.",
-        b2b_cta: "Acceder al Panel de Comercios →",
-        footer_terms: "Términos y Condiciones",
-        footer_privacy: "Política de Privacidad",
-        footer_made: "Comercio local independiente con inteligencia artificial.",
-        modal_close: "Entendido",
+        phone_online: "En línea",
+        phone_live_api: "API en vivo conectada",
+        chat_placeholder: "Busca un producto y barrio...",
+        chat_welcome: "¡Hola! Soy Nearbuy IA. Dime qué buscas en Argüelles, Salamanca o Tetuán y te enseño productos reales en stock cerca de ti.",
+        stock_badge: "En stock",
+        maps_cta: "Abrir en Google Maps →",
         chips: [
           "Vestido en Salamanca",
           "Juego de mesa o juguete",
           "Ramo de flores",
-          "Paraguas cerca de María de Molina"
+          "Paraguas en María de Molina"
         ],
-        maps_cta: "Ver en Maps →",
-        chat_greeting_reply: "¡Hola! ¿Qué te gustaría encontrar hoy en tiendas locales de Madrid? Prueba a pedirme un vestido en Salamanca, un ramo de flores, zapatos de piel, un libro o un juego de mesa.",
-        chat_no_umbrella: "He revisado el inventario TPV en vivo en Argüelles, Salamanca y Tetuán y ahora mismo ninguno de nuestros comercios asociados tiene paraguas en stock. ¿Quieres que busque vestidos, calzado, flores, joyas, libros o juegos de mesa?",
-        chat_no_match: "No he encontrado una coincidencia exacta en nuestro catálogo piloto actual de Madrid. Ahora mismo tenemos stock verificado en vestidos, calzado de piel, juguetes, juegos de mesa, ramos de flores, anillos y libros infantiles. ¡Prueba con alguno!",
-        chat_found_prefix: "Esto es lo que he encontrado en stock en comercios independientes cercanos:",
-        legal_terms_title: "Términos y Condiciones — Nearbuy",
+        mission_eyebrow: "N-COMMERCE · NEARBY COMMERCE",
+        mission_title: "No todas las ciudades deberían ser iguales.",
+        mission_desc: "Las grandes cadenas y el envío masivo están convirtiendo nuestras calles en pasillos idénticos. Nearbuy impulsa a las tiendas familiares conectando sus estanterías reales para mantener vivo tu barrio.",
+        pillar_1_title: "Stock local en tiempo real",
+        pillar_1_desc: "Comprueba qué hay realmente en una tienda cercana ahora mismo, con precios claros, fotos reales y horarios en vivo antes de salir de casa.",
+        pillar_2_title: "Barrios con vida propia",
+        pillar_2_desc: "Boutiques de especialidad, jugueterías independientes y floristerías dan personalidad a Madrid. Cada compra local protege la esencia de tus calles.",
+        pillar_3_title: "Apoya a familias locales",
+        pillar_3_desc: "Haz que el valor se quede en tu comunidad en lugar de irse a macroalmacenes lejanos, con trato cercano y cero cajas de cartón.",
+        comp_old_label: "E-commerce tradicional",
+        comp_old_1: "Esperas de 24–48 h y cartón",
+        comp_old_2: "Vacía de vida el barrio",
+        comp_old_3: "Sin consejo especialista",
+        comp_new_label: "N-commerce · Nearbuy",
+        comp_new_1: "Stock real a minutos a pie",
+        comp_new_2: "Impulsa familias de Madrid",
+        comp_new_3: "Cero cajas, recogida hoy",
+        how_eyebrow: "CÓMO FUNCIONA",
+        how_title: "De tu búsqueda a la tienda en 3 pasos.",
+        step_1_title: "Pregunta con naturalidad",
+        step_1_desc: "Cuéntale a Nearbuy qué necesitas y en qué barrio estás, como si le escribieras a alguien de confianza.",
+        step_2_title: "Stock verificado cerca de ti",
+        step_2_desc: "Nuestra IA cruza tu petición con el inventario real de comercios independientes en Argüelles, Salamanca y Tetuán.",
+        step_3_title: "Acércate y recógelo hoy",
+        step_3_desc: "Consulta precios, fotos reales, horarios y abre Google Maps para ir directo a la puerta de la tienda.",
+        shops_eyebrow: "PARA COMERCIOS LOCALES",
+        shops_title: "Convierte tu TPV actual en visibilidad online.",
+        shops_desc: "Sin subir catálogos a mano ni aprender programas nuevos. Nearbuy se conecta directamente al inventario digital que ya gestionas en tu TPV.",
+        tpv_1: "Tu TPV actual",
+        tpv_2: "Exportación automática de stock",
+        tpv_3: "Visible en Nearbuy IA",
+        tpv_4: "Clientes en tu puerta hoy",
+        shop_feat_1_title: "Sincronización TPV automática",
+        shop_feat_1_desc: "Sincroniza tu inventario digital directamente desde tu TPV habitual sin cargas manuales ni hojas de cálculo.",
+        shop_feat_2_title: "Activo en 5 minutos",
+        shop_feat_2_desc: "Conecta la ficha de tu tienda, tus horarios y tu inventario en minutos, sin conocimientos técnicos.",
+        shop_feat_3_title: "Visitas directas al local",
+        shop_feat_3_desc: "Atrae compradores de tu barrio directos a tu puerta, sin envíos ni complicaciones logísticas.",
+        shops_bar_title: "¿Listo para poner tu comercio de barrio en Nearbuy?",
+        shops_bar_sub: "Incorporando actualmente tiendas independientes en Argüelles, Salamanca y Tetuán.",
+        shops_cta: "Unirme como comercio local →",
+        footer_tagline: "Find everything, nearby.",
+        footer_copy: "© 2026 Nearbuy · N-commerce Madrid. Todos los derechos reservados.",
+        footer_terms: "Términos y Condiciones",
+        footer_privacy: "Política de Privacidad",
+        chat_greeting_reply: "¡Hola! Pregúntame por vestidos, calzado, juguetes, juegos de mesa, ramos de flores o anillos en Argüelles, Salamanca o Tetuán.",
+        chat_not_found_umbrella: "He revisado las tiendas conectadas cerca de María de Molina y en Salamanca, Argüelles y Tetuán, y ahora mismo ninguna tiene paraguas en stock. ¿Quieres ver vestidos, calzado, flores o juegos de mesa cercanos?",
+        chat_not_found_generic: "No he encontrado una coincidencia exacta en nuestro catálogo piloto actual de Madrid (Argüelles, Salamanca y Tetuán). Prueba buscando un vestido, zapatos, juego de mesa, flores o un anillo.",
+        chat_found_prefix: "Esto es lo que he encontrado disponible en tiendas independientes cercanas de Madrid:",
+        legal_terms_title: "Términos y Condiciones",
         legal_terms_html: `
-          <p><strong>1. Objeto de la plataforma:</strong> Nearbuy es una plataforma digital de <em>N-commerce</em> (Nearbuy Commerce) diseñada para facilitar el descubrimiento de productos disponibles en comercios locales independientes de Madrid (fase piloto en Argüelles, Salamanca y Tetuán).</p>
-          <p><strong>2. Exactitud del stock y precios:</strong> La información de inventario, fotografías, precios y horarios procede de la sincronización con los TPV y catálogos proporcionados por cada comercio adherido. Nearbuy actúa como escaparate de descubrimiento y no realiza cobros ni envíos directos.</p>
-          <p><strong>3. Uso del asistente IA:</strong> Las recomendaciones generadas por el asistente inteligente tienen carácter informativo para ayudarte a localizar tiendas cercanas y calcular rutas aproximadas a pie mediante Google Maps.</p>
-          <p><strong>4. Propiedad intelectual:</strong> La marca Nearbuy, su logotipo, identidad visual y software están protegidos por la normativa vigente. Contacto oficial: @nearbuyspain.</p>
+          <p><strong>1. Sobre Nearbuy (N-commerce)</strong><br />Nearbuy es una plataforma de descubrimiento de producto local que conecta a compradores de Madrid con el stock real de tiendas independientes en Argüelles, Salamanca y Tetuán.</p>
+          <p><strong>2. Precisión de inventario y precios</strong><br />La disponibilidad, fotografías y precios se sincronizan directamente desde el TPV de los comercios adheridos. Al tratarse de venta en tienda física, la disponibilidad final se confirma en el establecimiento.</p>
+          <p><strong>3. Sin intermediación en la venta</strong><br />Nearbuy actúa como asistente de descubrimiento y te dirige al comercio físico. Las compras, garantías y devoluciones se gestionan directamente con la tienda local.</p>
         `,
-        legal_privacy_title: "Política de Privacidad — Nearbuy",
+        legal_privacy_title: "Política de Privacidad",
         legal_privacy_html: `
-          <p><strong>1. Responsable del tratamiento:</strong> Equipo Nearbuy (Madrid, España). Protegemos tu privacidad conforme al Reglamento General de Protección de Datos (RGPD) y la LOPDGDD.</p>
-          <p><strong>2. Datos tratados:</strong> Únicamente procesamos las consultas de texto y la ubicación aproximada (calle, barrio o estación de metro en Madrid) que introduces voluntariamente en el chat para calcular distancias a pie hacia tiendas locales.</p>
-          <p><strong>3. Conservación y cesión:</strong> No vendemos datos personales a terceros ni almacenamos tu ubicación precisa en segundo plano. Las conversaciones de prueba se utilizan únicamente para ofrecer la respuesta solicitada en tiempo real.</p>
-          <p><strong>4. Derechos:</strong> Puedes solicitar acceso, rectificación o supresión de cualquier dato contactando a través de nuestros canales oficiales (@nearbuyspain).</p>
-        `,
-        merchant_modal_title: "Panel de Comercios — Nearbuy",
-        merchant_modal_html: `
-          <p>Estás viendo la versión MVP de demostración de <strong>Nearbuy</strong>. El botón de acceso ya está preparado para enlazar directamente con vuestro portal web de registro de tiendas.</p>
-          <p>Para conectarlo a tu URL real, solo tienes que actualizar la constante <code class="px-1.5 py-0.5 rounded bg-slate-100 text-nearbuy-cobalt font-mono text-xs">MERCHANT_PORTAL_URL</code> en la parte superior del script.</p>
+          <p><strong>1. Minimización de datos</strong><br />Nearbuy no exige registro para buscar productos locales. Las consultas introducidas en el asistente IA se procesan únicamente para devolver recomendaciones de tiendas cercanas.</p>
+          <p><strong>2. Ubicación y mapas</strong><br />Solo utilizamos el barrio que indicas en tu búsqueda. Al pulsar el enlace de Google Maps accederás al servicio de Google bajo su propia política de privacidad.</p>
+          <p><strong>3. Contacto y derechos (RGPD)</strong><br />De acuerdo con el RGPD europeo, puedes solicitar información o la eliminación de cualquier dato de contacto comercial escribiéndonos a través de @nearbuyspain.</p>
         `
       }
     };
 
     // =========================================================================
-    // 4. APPLICATION STATE
+    // 5. APPLICATION STATE
     // =========================================================================
     let currentLang = "en";
-    let isPhoneExpanded = false;
+    let isFullscreenOpen = false;
+    let isAnimatingTransition = false;
     let isWaitingResponse = false;
     let currentLegalModalType = null;
+    let lastPhoneRect = null;
+    let chatHistory = [];
 
     // =========================================================================
-    // 5. UTILITY HELPERS
+    // 6. UTILITY HELPERS
     // =========================================================================
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
     function normalizeText(str) {
       return String(str || "")
         .toLowerCase()
@@ -1159,39 +1197,36 @@
         .trim();
     }
 
-    function escapeHtml(str) {
-      const div = document.createElement("div");
-      div.textContent = String(str || "");
-      return div.innerHTML;
-    }
-
     function buildMapsUrl(storeName, address) {
-      const query = encodeURIComponent(`${storeName}, ${address}`);
-      return `https://www.google.com/maps/search/?api=1&query=${query}`;
+      const q = encodeURIComponent(`${storeName}, ${address}`);
+      return `https://www.google.com/maps/search/?api=1&query=${q}`;
     }
 
     // =========================================================================
-    // 6. LANGUAGE SWITCHER (EN DEFAULT / ES)
+    // 7. LANGUAGE SWITCHING (SYNCED ACROSS PAGE, CHAT & MODALS)
     // =========================================================================
     function setLanguage(lang) {
       currentLang = lang === "es" ? "es" : "en";
       document.documentElement.lang = currentLang;
       const t = TRANSLATIONS[currentLang];
 
-      // Update toggle pill active styles
-      const btnEn = document.getElementById("lang-en");
-      const btnEs = document.getElementById("lang-es");
-      if (btnEn && btnEs) {
+      // Sync EN | ES pill styling in Header & Fullscreen Bar
+      const togglePairs = [
+        { en: document.getElementById("lang-en"), es: document.getElementById("lang-es"), pad: "px-2.5 py-1.5" },
+        { en: document.getElementById("fs-lang-en"), es: document.getElementById("fs-lang-es"), pad: "px-2.5 py-1" }
+      ];
+      togglePairs.forEach(({ en, es, pad }) => {
+        if (!en || !es) return;
         if (currentLang === "en") {
-          btnEn.className = "px-2.5 py-1.5 rounded-full bg-nearbuy-cobalt text-white transition-colors cursor-pointer";
-          btnEs.className = "px-2.5 py-1.5 rounded-full text-nearbuy-charcoal/70 hover:text-nearbuy-charcoal transition-colors cursor-pointer";
+          en.className = `${pad} rounded-full bg-nearbuy-cobalt text-white transition-colors cursor-pointer`;
+          es.className = `${pad} rounded-full text-nearbuy-charcoal/70 hover:text-nearbuy-charcoal transition-colors cursor-pointer`;
         } else {
-          btnEs.className = "px-2.5 py-1.5 rounded-full bg-nearbuy-cobalt text-white transition-colors cursor-pointer";
-          btnEn.className = "px-2.5 py-1.5 rounded-full text-nearbuy-charcoal/70 hover:text-nearbuy-charcoal transition-colors cursor-pointer";
+          es.className = `${pad} rounded-full bg-nearbuy-cobalt text-white transition-colors cursor-pointer`;
+          en.className = `${pad} rounded-full text-nearbuy-charcoal/70 hover:text-nearbuy-charcoal transition-colors cursor-pointer`;
         }
-      }
+      });
 
-      // Translate all [data-i18n] nodes
+      // Translate all [data-i18n] elements
       document.querySelectorAll("[data-i18n]").forEach((el) => {
         const key = el.getAttribute("data-i18n");
         if (key && typeof t[key] === "string") {
@@ -1199,28 +1234,30 @@
         }
       });
 
-      // Update chat input placeholder
-      const chatInput = document.getElementById("chat-input");
-      if (chatInput) {
-        chatInput.placeholder = t.chat_placeholder;
-      }
+      // Update chat placeholders
+      ["chat-input", "fs-chat-input"].forEach((id) => {
+        const input = document.getElementById(id);
+        if (input) input.placeholder = t.chat_placeholder;
+      });
 
-      // Update status label
+      // Update status text
       const statusEl = document.getElementById("chat-status-text");
       if (statusEl) {
         statusEl.textContent = BACKEND_API_URL ? t.phone_live_api : t.phone_online;
       }
 
-      // Re-render quick chips in selected language
+      // Re-render quick chips & chat messages
       renderQuickChips();
-
-      // Refresh welcome message if chat only has the initial welcome bubble
-      const messagesEl = document.getElementById("chat-messages");
-      if (messagesEl && messagesEl.children.length <= 1) {
+      if (chatHistory.length <= 1) {
         resetChat();
+      } else {
+        if (chatHistory[0] && chatHistory[0].isWelcome) {
+          chatHistory[0].text = t.chat_welcome;
+        }
+        renderChatHistory();
       }
 
-      // If a legal/merchant modal is currently open, re-render it in the new language
+      // If legal modal is open, re-render it in the active language
       const legalModal = document.getElementById("legal-modal");
       if (legalModal && legalModal.classList.contains("is-open") && currentLegalModalType) {
         openLegalModal(currentLegalModalType);
@@ -1228,52 +1265,175 @@
     }
 
     // =========================================================================
-    // 7. UI CONTROLS (MOBILE MENU, PHONE EXPAND, LEGAL MODALS)
+    // 8. CINEMATIC MACOS-STYLE CAMERA POV DIVE-IN + WINDOW EXPANSION
+    // =========================================================================
+    function getRestingPhoneScreenRect() {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const screen = document.getElementById("phone-screen");
+
+      if (screen) {
+        const r = screen.getBoundingClientRect();
+        const isVisibleInViewport = r.bottom > 48 && r.top < vh - 48 && r.right > 48 && r.left < vw - 48;
+        if (isVisibleInViewport) {
+          return {
+            top: r.top,
+            left: r.left,
+            right: r.right,
+            bottom: r.bottom,
+            width: r.width,
+            height: r.height
+          };
+        }
+      }
+
+      // Clean centered fallback if user triggered from lower down the page
+      const w = Math.min(280, vw - 40);
+      const h = Math.min(580, vh - 64);
+      const left = (vw - w) / 2;
+      const top = (vh - h) / 2;
+      return { top, left, right: left + w, bottom: top + h, width: w, height: h };
+    }
+
+    function buildClipInset(rect, vw, vh) {
+      const top = Math.max(0, Math.round(rect.top));
+      const right = Math.max(0, Math.round(vw - rect.right));
+      const bottom = Math.max(0, Math.round(vh - rect.bottom));
+      const left = Math.max(0, Math.round(rect.left));
+      return `inset(${top}px ${right}px ${bottom}px ${left}px round 34px)`;
+    }
+
+    function openFullscreenChat(initialQuery = null) {
+      const fsChat = document.getElementById("fullscreen-chat");
+      const fsInner = document.getElementById("fs-chat-inner");
+      const pageWrapper = document.getElementById("page-wrapper");
+      if (!fsChat || !fsInner || !pageWrapper) return;
+
+      if (isFullscreenOpen) {
+        if (initialQuery && typeof initialQuery === "string") {
+          sendChatMessage(initialQuery);
+        }
+        return;
+      }
+      if (isAnimatingTransition) return;
+
+      isFullscreenOpen = true;
+      isAnimatingTransition = true;
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const rect = getRestingPhoneScreenRect();
+      lastPhoneRect = rect;
+
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+
+      // Step 1: Lock camera POV origin to smartphone screen center and dive in
+      pageWrapper.style.transformOrigin = `${cx}px ${cy}px`;
+      pageWrapper.style.transition = "transform 0.62s cubic-bezier(0.32, 0.72, 0, 1), filter 0.52s cubic-bezier(0.32, 0.72, 0, 1)";
+      void pageWrapper.offsetWidth;
+      pageWrapper.style.transform = "scale(1.38)";
+      pageWrapper.style.filter = "blur(8px)";
+
+      // Step 2: Position #fullscreen-chat clipped tightly to the smartphone screen
+      fsChat.style.transition = "none";
+      fsChat.style.display = "flex";
+      fsChat.style.pointerEvents = "auto";
+      fsChat.style.clipPath = buildClipInset(rect, vw, vh);
+      fsChat.style.transform = "scale(0.96)";
+      fsChat.style.opacity = "0";
+      fsChat.setAttribute("aria-hidden", "false");
+      fsInner.classList.remove("is-visible");
+
+      // Force single layout reflow to commit starting clip-path
+      void fsChat.offsetWidth;
+
+      document.body.style.overflow = "hidden";
+
+      // Step 3: ~90ms into the camera dive, seamlessly bloom window to fullscreen
+      setTimeout(() => {
+        if (!isFullscreenOpen) return;
+        fsChat.style.transition =
+          "clip-path 560ms cubic-bezier(0.22, 1, 0.36, 1), " +
+          "transform 560ms cubic-bezier(0.22, 1, 0.36, 1), " +
+          "opacity 360ms cubic-bezier(0.22, 1, 0.36, 1)";
+        fsChat.style.clipPath = "inset(0px 0px 0px 0px round 0px)";
+        fsChat.style.transform = "scale(1)";
+        fsChat.style.opacity = "1";
+      }, 90);
+
+      // Step 4: Bloom inner chat interface cleanly like a native macOS app window
+      setTimeout(() => {
+        if (!isFullscreenOpen) return;
+        fsInner.classList.add("is-visible");
+        scrollChatToBottom();
+      }, 170);
+
+      // Step 5: Unlock animation guard, focus input, and dispatch chip query if any
+      setTimeout(() => {
+        isAnimatingTransition = false;
+        if (!isFullscreenOpen) return;
+        const fsInput = document.getElementById("fs-chat-input");
+        if (fsInput) fsInput.focus();
+        if (initialQuery && typeof initialQuery === "string") {
+          sendChatMessage(initialQuery);
+        }
+      }, 620);
+    }
+
+    function closeFullscreenChat() {
+      const fsChat = document.getElementById("fullscreen-chat");
+      const fsInner = document.getElementById("fs-chat-inner");
+      const pageWrapper = document.getElementById("page-wrapper");
+      if (!fsChat || !fsInner || !pageWrapper || !isFullscreenOpen || isAnimatingTransition) return;
+
+      isFullscreenOpen = false;
+      isAnimatingTransition = true;
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const rect = lastPhoneRect || getRestingPhoneScreenRect();
+
+      // Step 1: Softly retract inner content & morph window back into smartphone screen
+      fsInner.classList.remove("is-visible");
+      fsChat.style.pointerEvents = "none";
+      fsChat.style.transition =
+        "clip-path 480ms cubic-bezier(0.32, 0.72, 0, 1), " +
+        "transform 480ms cubic-bezier(0.32, 0.72, 0, 1), " +
+        "opacity 420ms cubic-bezier(0.32, 0.72, 0, 1)";
+      fsChat.style.clipPath = buildClipInset(rect, vw, vh);
+      fsChat.style.transform = "scale(0.96)";
+      fsChat.style.opacity = "0";
+      fsChat.setAttribute("aria-hidden", "true");
+
+      // Step 2: Simultaneously pull the camera back out on #page-wrapper
+      pageWrapper.style.transition = "transform 540ms cubic-bezier(0.32, 0.72, 0, 1), filter 540ms cubic-bezier(0.32, 0.72, 0, 1)";
+      pageWrapper.style.transform = "scale(1)";
+      pageWrapper.style.filter = "blur(0px)";
+
+      // Step 3: Clean up inline styles once reverse transition completes
+      setTimeout(() => {
+        isAnimatingTransition = false;
+        if (!isFullscreenOpen) {
+          fsChat.style.display = "none";
+          pageWrapper.style.transition = "";
+          pageWrapper.style.transform = "";
+          pageWrapper.style.filter = "";
+          pageWrapper.style.transformOrigin = "";
+          if (!currentLegalModalType) {
+            document.body.style.overflow = "";
+          }
+          scrollChatToBottom();
+        }
+      }, 550);
+    }
+
+    // =========================================================================
+    // 9. MOBILE MENU & LEGAL MODALS
     // =========================================================================
     function toggleMobileMenu() {
       const menu = document.getElementById("mobile-menu");
       if (menu) menu.classList.toggle("hidden");
-    }
-
-    function focusPhoneChat() {
-      const phone = document.getElementById("phone-shell");
-      const input = document.getElementById("chat-input");
-      if (phone) {
-        phone.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      if (input) {
-        setTimeout(() => input.focus(), 350);
-      }
-    }
-
-    function togglePhoneExpand(forceState) {
-      const shell = document.getElementById("phone-shell");
-      const backdrop = document.getElementById("phone-backdrop");
-      const expandBtn = document.getElementById("expand-phone-btn");
-      if (!shell || !backdrop || !expandBtn) return;
-
-      const nextState = typeof forceState === "boolean" ? forceState : !isPhoneExpanded;
-      isPhoneExpanded = nextState;
-
-      if (isPhoneExpanded) {
-        shell.classList.add("is-expanded");
-        backdrop.classList.add("is-open");
-        backdrop.setAttribute("aria-hidden", "false");
-        expandBtn.textContent = "✕";
-        expandBtn.setAttribute("title", currentLang === "es" ? "Cerrar vista ampliada" : "Close expanded view");
-        document.body.style.overflow = "hidden";
-        setTimeout(() => {
-          const input = document.getElementById("chat-input");
-          if (input) input.focus();
-        }, 180);
-      } else {
-        shell.classList.remove("is-expanded");
-        backdrop.classList.remove("is-open");
-        backdrop.setAttribute("aria-hidden", "true");
-        expandBtn.textContent = "⤢";
-        expandBtn.setAttribute("title", currentLang === "es" ? "Ampliar chat" : "Expand chat");
-        document.body.style.overflow = "";
-      }
     }
 
     function openLegalModal(type) {
@@ -1282,18 +1442,15 @@
       const bodyEl = document.getElementById("legal-modal-body");
       if (!modal || !titleEl || !bodyEl) return;
 
-      currentLegalModalType = type;
       const t = TRANSLATIONS[currentLang];
+      currentLegalModalType = type;
 
-      if (type === "terms") {
-        titleEl.textContent = t.legal_terms_title;
-        bodyEl.innerHTML = t.legal_terms_html;
-      } else if (type === "privacy") {
+      if (type === "privacy") {
         titleEl.textContent = t.legal_privacy_title;
         bodyEl.innerHTML = t.legal_privacy_html;
-      } else if (type === "merchant") {
-        titleEl.textContent = t.merchant_modal_title;
-        bodyEl.innerHTML = t.merchant_modal_html;
+      } else {
+        titleEl.textContent = t.legal_terms_title;
+        bodyEl.innerHTML = t.legal_terms_html;
       }
 
       modal.classList.add("is-open");
@@ -1307,80 +1464,110 @@
       modal.classList.remove("is-open");
       modal.setAttribute("aria-hidden", "true");
       currentLegalModalType = null;
-      if (!isPhoneExpanded) {
+      if (!isFullscreenOpen) {
         document.body.style.overflow = "";
       }
     }
 
-    function handleLegalBackdropClick(event) {
-      if (event.target && event.target.id === "legal-modal") {
-        closeLegalModal();
-      }
-    }
-
-    function handleMerchantLink(event) {
-      if (MERCHANT_PORTAL_URL && MERCHANT_PORTAL_URL !== "#" && MERCHANT_PORTAL_URL !== "#merchants") {
-        return; // Allow normal navigation when a live merchant portal URL is set
-      }
-      event.preventDefault();
-      openLegalModal("merchant");
-    }
-
     // =========================================================================
-    // 8. INTERACTIVE CHAT ENGINE (LOCAL CATALOG + READY FOR FASTAPI)
+    // 10. SYNCED CHAT ENGINE (SMARTPHONE + FULLSCREEN + LOCAL DEMO / LIVE API)
     // =========================================================================
     function renderQuickChips() {
-      const container = document.getElementById("quick-chips");
-      if (!container) return;
       const chips = TRANSLATIONS[currentLang].chips;
-      container.innerHTML = "";
 
-      chips.forEach((chipText) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = chipText;
-        btn.className = "shrink-0 px-2.5 py-1 rounded-full bg-nearbuy-mint/80 hover:bg-nearbuy-mint text-nearbuy-cobalt text-[11px] font-semibold transition-colors cursor-pointer whitespace-nowrap";
-        btn.addEventListener("click", () => sendChatMessage(chipText));
-        container.appendChild(btn);
-      });
+      const phoneChips = document.getElementById("quick-chips");
+      if (phoneChips) {
+        phoneChips.innerHTML = "";
+        chips.forEach((chipText) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = chipText;
+          btn.className = "shrink-0 px-2.5 py-1 rounded-full bg-nearbuy-mint/85 hover:bg-nearbuy-mint text-nearbuy-cobalt text-[11px] font-semibold transition-colors cursor-pointer whitespace-nowrap";
+          btn.addEventListener("click", () => openFullscreenChat(chipText));
+          phoneChips.appendChild(btn);
+        });
+      }
+
+      const fsChips = document.getElementById("fs-quick-chips");
+      if (fsChips) {
+        fsChips.innerHTML = "";
+        chips.forEach((chipText) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = chipText;
+          btn.className = "shrink-0 px-3.5 py-1.5 rounded-full bg-nearbuy-mint/85 hover:bg-nearbuy-mint text-nearbuy-cobalt text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap";
+          btn.addEventListener("click", () => sendChatMessage(chipText));
+          fsChips.appendChild(btn);
+        });
+      }
     }
 
     function scrollChatToBottom() {
-      const messagesEl = document.getElementById("chat-messages");
-      if (messagesEl) {
-        messagesEl.scrollTop = messagesEl.scrollHeight;
-      }
+      const phoneScroll = document.getElementById("chat-messages");
+      if (phoneScroll) phoneScroll.scrollTop = phoneScroll.scrollHeight;
+
+      const fsScroll = document.getElementById("fs-chat-scroll");
+      if (fsScroll) fsScroll.scrollTop = fsScroll.scrollHeight;
     }
 
-    function appendUserBubble(text) {
-      const messagesEl = document.getElementById("chat-messages");
-      if (!messagesEl) return;
-
-      const wrapper = document.createElement("div");
-      wrapper.className = "flex justify-end";
-      wrapper.innerHTML = `
-        <div class="max-w-[82%] rounded-2xl rounded-br-sm bg-nearbuy-cobalt text-white px-3.5 py-2 text-xs leading-relaxed shadow-sm">
-          ${escapeHtml(text)}
-        </div>
-      `;
-      messagesEl.appendChild(wrapper);
-      scrollChatToBottom();
-    }
-
-    function appendAssistantBubble(text, items = []) {
-      const messagesEl = document.getElementById("chat-messages");
-      if (!messagesEl) return;
-
+    function buildMessageHtml(msg, isFullscreen) {
       const t = TRANSLATIONS[currentLang];
-      const wrapper = document.createElement("div");
-      wrapper.className = "flex items-start gap-2";
+
+      if (msg.role === "user") {
+        const bubbleClass = isFullscreen
+          ? "max-w-[82%] sm:max-w-[70%] rounded-2xl rounded-br-sm bg-nearbuy-cobalt text-white px-4 py-2.5 text-sm leading-relaxed shadow-sm"
+          : "max-w-[82%] rounded-2xl rounded-br-sm bg-nearbuy-cobalt text-white px-3.5 py-2 text-xs leading-relaxed shadow-sm";
+        return `
+          <div class="flex justify-end">
+            <div class="${bubbleClass}">${escapeHtml(msg.text)}</div>
+          </div>
+        `;
+      }
 
       let cardsHtml = "";
-      if (Array.isArray(items) && items.length > 0) {
-        cardsHtml = `<div class="mt-2 space-y-2">` + items.map((item) => {
+      if (Array.isArray(msg.items) && msg.items.length > 0) {
+        const gridClass = isFullscreen ? "mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3" : "mt-2 space-y-2";
+        cardsHtml = `<div class="${gridClass}">` + msg.items.map((item) => {
           const hours = currentLang === "es" ? item.hours_es : item.hours_en;
           const mapsUrl = buildMapsUrl(item.store_name, item.address);
           const priceStr = typeof item.price === "number" ? `€${item.price.toFixed(2)}` : escapeHtml(item.price);
+
+          if (isFullscreen) {
+            return `
+              <div class="rounded-2xl bg-white border border-slate-200/90 p-3.5 flex gap-3.5 shadow-sm hover:border-nearbuy-cobalt/40 transition-colors">
+                <img
+                  src="${escapeHtml(item.image_url)}"
+                  alt="${escapeHtml(item.product_name)}"
+                  onerror="this.onerror=null;this.src='${FALLBACK_PRODUCT_IMG}';"
+                  class="w-20 h-20 rounded-xl object-cover bg-slate-100 shrink-0 border border-slate-100"
+                />
+                <div class="min-w-0 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-start justify-between gap-2">
+                      <p class="font-bold text-sm text-nearbuy-charcoal leading-snug">${escapeHtml(item.product_name)}</p>
+                      <span class="font-bold text-sm text-nearbuy-cobalt shrink-0">${priceStr}</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                      <span class="text-xs font-bold text-slate-700">${escapeHtml(item.store_name)}</span>
+                      <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">${escapeHtml(item.district)}</span>
+                      <span class="px-2 py-0.5 rounded-full bg-nearbuy-mint text-nearbuy-cobalt text-[10px] font-bold">${escapeHtml(t.stock_badge)}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-1 truncate">${escapeHtml(item.address)}</p>
+                    <p class="text-[11px] text-emerald-700 font-semibold mt-0.5">${escapeHtml(hours)}</p>
+                  </div>
+                  <a
+                    href="${mapsUrl}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-block mt-2 text-xs font-bold text-nearbuy-cobalt hover:underline"
+                  >
+                    ${escapeHtml(t.maps_cta)}
+                  </a>
+                </div>
+              </div>
+            `;
+          }
+
           return `
             <div class="rounded-xl bg-white border border-slate-200/90 p-2 flex gap-2.5 shadow-sm">
               <img
@@ -1410,129 +1597,156 @@
         }).join("") + `</div>`;
       }
 
-      wrapper.innerHTML = `
-        <div class="w-6 h-6 rounded-full bg-nearbuy-mint border border-nearbuy-cobalt/15 p-0.5 flex items-center justify-center shrink-0 mt-0.5">
-          <img src="${MASCOT_DATA_URI}" alt="Nearbuy" class="w-full h-full object-contain" />
-        </div>
-        <div class="max-w-[85%] min-w-0">
-          <div class="rounded-2xl rounded-tl-sm bg-white border border-slate-200/90 px-3 py-2 text-xs text-nearbuy-charcoal leading-relaxed shadow-sm">
-            ${escapeHtml(text)}
+      const avatarSize = isFullscreen ? "w-8 h-8 p-1" : "w-6 h-6 p-0.5";
+      const containerWidth = isFullscreen ? "max-w-[90%] sm:max-w-[85%]" : "max-w-[85%]";
+      const bubbleClass = isFullscreen
+        ? "rounded-2xl rounded-tl-sm bg-white border border-slate-200/90 px-4 py-3 text-sm text-nearbuy-charcoal leading-relaxed shadow-sm"
+        : "rounded-2xl rounded-tl-sm bg-white border border-slate-200/90 px-3 py-2 text-xs text-nearbuy-charcoal leading-relaxed shadow-sm";
+
+      return `
+        <div class="flex items-start gap-2.5">
+          <div class="${avatarSize} rounded-full bg-nearbuy-mint border border-nearbuy-cobalt/15 flex items-center justify-center shrink-0 mt-0.5">
+            <img src="${MASCOT_IMG}" alt="Nearbuy" class="w-full h-full object-contain" />
           </div>
-          ${cardsHtml}
+          <div class="${containerWidth} min-w-0">
+            <div class="${bubbleClass}">${escapeHtml(msg.text)}</div>
+            ${cardsHtml}
+          </div>
         </div>
       `;
+    }
 
-      messagesEl.appendChild(wrapper);
+    function renderChatHistory() {
+      const phoneMessages = document.getElementById("chat-messages");
+      const fsMessages = document.getElementById("fs-chat-messages");
+
+      if (phoneMessages) {
+        phoneMessages.innerHTML = chatHistory.map((m) => buildMessageHtml(m, false)).join("");
+      }
+      if (fsMessages) {
+        fsMessages.innerHTML = chatHistory.map((m) => buildMessageHtml(m, true)).join("");
+      }
       scrollChatToBottom();
     }
 
     function showTypingIndicator() {
-      const messagesEl = document.getElementById("chat-messages");
-      if (!messagesEl) return;
-
-      const loader = document.createElement("div");
-      loader.id = "chat-typing-indicator";
-      loader.className = "flex items-center gap-2";
-      loader.innerHTML = `
-        <div class="w-6 h-6 rounded-full bg-nearbuy-mint border border-nearbuy-cobalt/15 p-0.5 flex items-center justify-center shrink-0">
-          <img src="${MASCOT_DATA_URI}" alt="Nearbuy" class="w-full h-full object-contain" />
-        </div>
-        <div class="rounded-2xl rounded-tl-sm bg-white border border-slate-200/90 px-3 py-2.5 flex items-center gap-1">
-          <span class="typing-dot w-1.5 h-1.5 rounded-full bg-nearbuy-cobalt"></span>
-          <span class="typing-dot w-1.5 h-1.5 rounded-full bg-nearbuy-cobalt"></span>
-          <span class="typing-dot w-1.5 h-1.5 rounded-full bg-nearbuy-cobalt"></span>
-        </div>
-      `;
-      messagesEl.appendChild(loader);
+      const targets = [
+        { el: document.getElementById("chat-messages"), fs: false },
+        { el: document.getElementById("fs-chat-messages"), fs: true }
+      ];
+      targets.forEach(({ el, fs }) => {
+        if (!el) return;
+        const loader = document.createElement("div");
+        loader.className = "chat-typing-indicator flex items-center gap-2.5";
+        const avatarSize = fs ? "w-8 h-8 p-1" : "w-6 h-6 p-0.5";
+        loader.innerHTML = `
+          <div class="${avatarSize} rounded-full bg-nearbuy-mint border border-nearbuy-cobalt/15 flex items-center justify-center shrink-0">
+            <img src="${MASCOT_IMG}" alt="Nearbuy" class="w-full h-full object-contain" />
+          </div>
+          <div class="rounded-2xl rounded-tl-sm bg-white border border-slate-200/90 px-3.5 py-2.5 flex items-center gap-1">
+            <span class="typing-dot w-1.5 h-1.5 rounded-full bg-nearbuy-cobalt"></span>
+            <span class="typing-dot w-1.5 h-1.5 rounded-full bg-nearbuy-cobalt"></span>
+            <span class="typing-dot w-1.5 h-1.5 rounded-full bg-nearbuy-cobalt"></span>
+          </div>
+        `;
+        el.appendChild(loader);
+      });
       scrollChatToBottom();
     }
 
     function removeTypingIndicator() {
-      const loader = document.getElementById("chat-typing-indicator");
-      if (loader) loader.remove();
+      document.querySelectorAll(".chat-typing-indicator").forEach((el) => el.remove());
     }
 
     function resetChat() {
-      const messagesEl = document.getElementById("chat-messages");
-      if (!messagesEl) return;
-      messagesEl.innerHTML = "";
-      appendAssistantBubble(TRANSLATIONS[currentLang].chat_welcome);
+      chatHistory = [{
+        role: "assistant",
+        text: TRANSLATIONS[currentLang].chat_welcome,
+        items: [],
+        isWelcome: true
+      }];
+      renderChatHistory();
     }
 
-    function queryLocalCatalog(userMessage) {
+    function searchLocalCatalog(query) {
       const t = TRANSLATIONS[currentLang];
-      const q = normalizeText(userMessage);
+      const q = normalizeText(query);
 
-      // 1. Greetings
-      const greetingWords = ["hi", "hello", "hey", "good morning", "good afternoon", "hola", "buenos dias", "buenas"];
-      if (greetingWords.some((g) => q === g || q.startsWith(g + " ") || q.startsWith(g + "!"))) {
-        // If message is just a greeting without product keywords
-        const hasProduct = REAL_CATALOG.some((item) => item.keywords.some((kw) => q.includes(kw)));
-        if (!hasProduct && !q.includes("umbrella") && !q.includes("paraguas")) {
-          return { text: t.chat_greeting_reply, items: [] };
-        }
+      // 1. Friendly conversational greetings
+      if (/^(hi|hello|hey|hola|buenas|buenos dias|buenas tardes)\b/.test(q) && q.split(/\s+/).length <= 4) {
+        return { text: t.chat_greeting_reply, items: [] };
       }
 
-      // 2. Honest out-of-stock case: Umbrella / Paraguas
+      // 2. Honest out-of-stock demo case (umbrella / paraguas)
       if (q.includes("umbrella") || q.includes("paraguas")) {
-        return { text: t.chat_no_umbrella, items: [] };
+        return { text: t.chat_not_found_umbrella, items: [] };
       }
 
-      // 3. Detect optional district filter
-      let requestedDistrict = null;
-      if (q.includes("salamanca") || q.includes("goya") || q.includes("serrano") || q.includes("hermosilla")) {
-        requestedDistrict = "salamanca";
-      } else if (q.includes("arguelles") || q.includes("princesa") || q.includes("moncloa")) {
-        requestedDistrict = "arguelles";
-      } else if (q.includes("tetuan") || q.includes("cuatro caminos") || q.includes("bravo murillo")) {
-        requestedDistrict = "tetuan";
-      }
+      // 3. Detect requested Madrid district
+      let districtFilter = null;
+      if (q.includes("arguelles")) districtFilter = "arguelles";
+      else if (q.includes("salamanca") || q.includes("goya") || q.includes("velazquez") || q.includes("ayala")) districtFilter = "salamanca";
+      else if (q.includes("tetuan") || q.includes("bravo murillo")) districtFilter = "tetuan";
 
-      // 4. Score catalog items by keyword & text match
-      const words = q.split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
-      const scored = REAL_CATALOG.map((item) => {
+      // 4. Score catalog items against query tokens
+      const tokens = q.split(/[^a-z0-9]+/).filter((w) => w.length >= 2);
+      const scored = LOCAL_CATALOG.map((item) => {
         let score = 0;
-        const searchable = normalizeText(`${item.product_name} ${item.store_name} ${item.district}`);
+        const itemDistrict = normalizeText(item.district);
+        const itemText = normalizeText(`${item.product_name} ${item.store_name} ${item.category} ${item.keywords.join(" ")}`);
 
-        item.keywords.forEach((kw) => {
-          if (q.includes(kw)) score += 3;
-        });
-        words.forEach((w) => {
-          if (searchable.includes(w)) score += 2;
+        tokens.forEach((tok) => {
+          if (item.keywords.some((kw) => normalizeText(kw) === tok)) {
+            score += 4;
+          } else if (itemText.includes(tok)) {
+            score += 2;
+          }
         });
 
-        // Slight boost if district matches requested district
-        if (requestedDistrict && normalizeText(item.district).includes(requestedDistrict) && score > 0) {
+        if (districtFilter && itemDistrict === districtFilter && score > 0) {
+          score += 5;
+        } else if (districtFilter && itemDistrict === districtFilter && tokens.length <= 3) {
           score += 2;
         }
+
         return { item, score };
       }).filter((entry) => entry.score > 0);
 
-      // Sort highest score first and take top 3
-      scored.sort((a, b) => b.score - a.score);
-      const matches = scored.slice(0, 3).map((entry) => entry.item);
-
-      if (matches.length > 0) {
-        return { text: t.chat_found_prefix, items: matches };
+      let matches = scored;
+      if (districtFilter) {
+        const districtOnly = scored.filter((e) => normalizeText(e.item.district) === districtFilter);
+        if (districtOnly.length > 0) {
+          matches = districtOnly;
+        }
       }
 
-      return { text: t.chat_no_match, items: [] };
+      matches.sort((a, b) => b.score - a.score);
+      const topItems = matches.slice(0, 4).map((e) => e.item);
+
+      if (topItems.length === 0) {
+        return { text: t.chat_not_found_generic, items: [] };
+      }
+
+      return { text: t.chat_found_prefix, items: topItems };
     }
 
     async function sendChatMessage(rawText) {
       const text = String(rawText || "").trim();
       if (!text || isWaitingResponse) return;
 
-      const input = document.getElementById("chat-input");
-      if (input) input.value = "";
+      ["chat-input", "fs-chat-input"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+      });
 
       isWaitingResponse = true;
-      appendUserBubble(text);
+      chatHistory.push({ role: "user", text });
+      renderChatHistory();
       showTypingIndicator();
 
       try {
-        // If a live FastAPI backend URL is configured, call it
         if (BACKEND_API_URL) {
+          // Live FastAPI backend integration (agent.py)
           const response = await fetch(BACKEND_API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1541,81 +1755,90 @@
           if (!response.ok) throw new Error("API error");
           const data = await response.json();
           removeTypingIndicator();
-          appendAssistantBubble(
-            data.reply || data.message || TRANSLATIONS[currentLang].chat_found_prefix,
-            Array.isArray(data.items) ? data.items : []
-          );
-          isWaitingResponse = false;
-          return;
+          chatHistory.push({
+            role: "assistant",
+            text: data.reply || data.text || TRANSLATIONS[currentLang].chat_found_prefix,
+            items: Array.isArray(data.items) ? data.items : []
+          });
+          renderChatHistory();
+        } else {
+          // Local 12-product Madrid demo mode
+          await new Promise((resolve) => setTimeout(resolve, 460));
+          const result = searchLocalCatalog(text);
+          removeTypingIndicator();
+          chatHistory.push({
+            role: "assistant",
+            text: result.text,
+            items: result.items
+          });
+          renderChatHistory();
         }
-
-        // Local realistic response delay
-        await new Promise((resolve) => setTimeout(resolve, 480));
-        const result = queryLocalCatalog(text);
-        removeTypingIndicator();
-        appendAssistantBubble(result.text, result.items);
       } catch (err) {
         removeTypingIndicator();
-        const fallback = queryLocalCatalog(text);
-        appendAssistantBubble(fallback.text, fallback.items);
+        const fallback = searchLocalCatalog(text);
+        chatHistory.push({
+          role: "assistant",
+          text: fallback.text,
+          items: fallback.items
+        });
+        renderChatHistory();
       } finally {
         isWaitingResponse = false;
       }
     }
 
     // =========================================================================
-    // 9. INITIALIZATION ON DOM READY
+    // 11. INITIALIZATION
     // =========================================================================
     document.addEventListener("DOMContentLoaded", () => {
-      // Inject official embedded brand images
-      const mascotTargets = ["header-logo-img", "phone-header-logo", "footer-logo-img"];
-      mascotTargets.forEach((id) => {
+      // Inject official mascot logo & shopping bags photo
+      ["header-logo-img", "phone-header-logo", "fs-header-logo", "footer-logo-img"].forEach((id) => {
         const img = document.getElementById(id);
-        if (img) img.src = MASCOT_DATA_URI;
+        if (img) img.src = MASCOT_IMG;
       });
 
       const bagsImg = document.getElementById("bags-photo-img");
-      if (bagsImg) bagsImg.src = BAGS_DATA_URI;
+      if (bagsImg) bagsImg.src = BAGS_IMG;
 
-      // Apply Instagram URL
+      // Apply configurable URLs
+      const merchantCta = document.getElementById("merchant-portal-cta");
+      if (merchantCta) merchantCta.href = MERCHANT_PORTAL_URL;
+
       const igLink = document.getElementById("instagram-link");
       if (igLink) igLink.href = INSTAGRAM_URL;
 
-      // Apply live Merchant Portal URL if configured
-      if (MERCHANT_PORTAL_URL && MERCHANT_PORTAL_URL !== "#" && MERCHANT_PORTAL_URL !== "#merchants") {
-        ["header-merchant-cta", "b2b-portal-cta"].forEach((id) => {
-          const cta = document.getElementById(id);
-          if (cta) {
-            cta.href = MERCHANT_PORTAL_URL;
-            cta.target = "_blank";
-            cta.rel = "noopener noreferrer";
-          }
-        });
-      }
-
-      // Bind chat form submission
+      // Smartphone form opens fullscreen chat with POV dive
       const chatForm = document.getElementById("chat-form");
       if (chatForm) {
         chatForm.addEventListener("submit", (event) => {
           event.preventDefault();
-          const input = document.getElementById("chat-input");
+          openFullscreenChat();
+        });
+      }
+
+      // Fullscreen form dispatches message
+      const fsChatForm = document.getElementById("fs-chat-form");
+      if (fsChatForm) {
+        fsChatForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          const input = document.getElementById("fs-chat-input");
           if (input) sendChatMessage(input.value);
         });
       }
 
-      // Global Escape key closes active modal or expanded smartphone
+      // Escape key closes active modal or pulls camera back from fullscreen chat
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
           const legalModal = document.getElementById("legal-modal");
           if (legalModal && legalModal.classList.contains("is-open")) {
             closeLegalModal();
-          } else if (isPhoneExpanded) {
-            togglePhoneExpand(false);
+          } else if (isFullscreenOpen) {
+            closeFullscreenChat();
           }
         }
       });
 
-      // Initialize default language to ENGLISH ("en")
+      // Initialize in English ("en") by default
       setLanguage("en");
     });
   </script>
